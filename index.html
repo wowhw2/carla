@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
+<meta name="referrer" content="no-referrer">
+<title>카를라 0~30화 검수 카드</title>
+<style>
+:root{--bg:#12100e;--panel:#1b1815;--line:#332e28;--fg:#e8e1d6;--dim:#9a9086;
+--gold:#c9a227;--del:#c85a4a;--ins:#6fae7a;}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--fg);
+font-family:"Noto Serif KR","Apple SD Gothic Neo","Malgun Gothic",serif;
+display:flex;overflow:hidden}
+#side{width:270px;flex:0 0 270px;background:var(--panel);border-right:1px solid var(--line);
+display:flex;flex-direction:column;height:100vh}
+#side h1{font-size:15px;margin:0;padding:16px 16px 10px;letter-spacing:.02em}
+#side h1 small{display:block;color:var(--dim);font-size:11px;font-weight:400;margin-top:4px}
+#q{margin:0 14px 10px;padding:7px 9px;background:#0e0c0a;border:1px solid var(--line);
+color:var(--fg);border-radius:5px;font-size:12px;font-family:inherit}
+#nav{overflow-y:auto;flex:1;padding-bottom:24px}
+.actname{font-size:11px;color:var(--gold);padding:12px 16px 5px;letter-spacing:.06em}
+.it{display:flex;align-items:baseline;gap:7px;padding:6px 16px;cursor:pointer;font-size:13px;
+border-left:2px solid transparent}
+.it:hover{background:#231f1b}
+.it.on{background:#2a2521;border-left-color:var(--gold)}
+.it.hid{display:none}
+.it .no{color:var(--dim);font-size:11px;min-width:30px}
+.it .tt{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.it .dot{font-size:10px;color:var(--dim)}
+.it.done .tt{color:var(--ins)}
+#main{flex:1;height:100vh;overflow-y:auto}
+#bar{position:sticky;top:0;background:rgba(18,16,14,.96);border-bottom:1px solid var(--line);
+padding:9px 26px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;z-index:5;
+backdrop-filter:blur(6px)}
+button{background:#241f1b;color:var(--fg);border:1px solid var(--line);border-radius:5px;
+padding:5px 11px;font-size:12px;cursor:pointer;font-family:inherit}
+button:hover{background:#2f2924}
+button.act{background:var(--gold);color:#1a1510;border-color:var(--gold);font-weight:600}
+#bar .sp{flex:1}
+#bar .cnt{color:var(--dim);font-size:11px}
+#wrap{max-width:820px;margin:0 auto;padding:26px 26px 120px}
+h2.tit{font-size:24px;margin:6px 0 4px;letter-spacing:-.01em}
+.stat{color:var(--dim);font-size:12px;margin-bottom:14px}
+.stat b{color:var(--fg);font-weight:600}
+.metabox{background:var(--panel);border:1px solid var(--line);border-radius:7px;
+padding:11px 14px;font-size:12px;color:var(--dim);line-height:1.75;margin-bottom:22px}
+.metabox ins{color:var(--fg);text-decoration:none;font-weight:600}
+#doc p{line-height:2.0;margin:0 0 1.15em;font-size:16px;letter-spacing:-.003em}
+#doc p.scene{text-align:center;color:var(--gold);margin:2.2em 0;letter-spacing:.3em;font-size:13px}
+#doc p.note{color:var(--dim);font-style:italic;font-size:13px;text-align:center;margin:2em 0}
+del{color:var(--del);text-decoration:line-through;text-decoration-thickness:1px;opacity:.75}
+ins{color:var(--ins);text-decoration:none;font-weight:600}
+body.clean del{display:none}
+body.clean ins{color:inherit;font-weight:inherit}
+#doc h3,#doc h4,#doc h5{margin:1.8em 0 .6em;font-size:15px;color:var(--gold)}
+#doc blockquote{margin:0 0 1.2em;padding:9px 13px;border-left:2px solid var(--line);
+background:var(--panel);color:var(--dim);font-size:12.5px;line-height:1.8}
+.tw{overflow-x:auto;margin:0 0 1.4em}
+#doc table{border-collapse:collapse;width:100%;font-size:12.5px}
+#doc th,#doc td{border:1px solid var(--line);padding:6px 9px;text-align:left;
+vertical-align:top;line-height:1.65}
+#doc th{background:#231f1b;color:var(--gold);white-space:nowrap}
+#doc code{background:#0e0c0a;padding:1px 5px;border-radius:3px;font-size:11.5px;color:#c8b89a}
+#doc hr{border:0;border-top:1px solid var(--line);margin:1.8em 0}
+#doc ul{padding-left:20px}#doc li{line-height:1.9;font-size:14px;margin-bottom:.3em}
+mark{background:#5d4a12;color:#f4e6bd;border-radius:2px}
+.cmt{background:#4a3a10;border-bottom:2px solid var(--gold);border-radius:2px;cursor:pointer}
+.cmt:hover,.cmt.sel{background:#6d551a}
+.cmtblk{outline:1px dashed var(--gold);outline-offset:3px;border-radius:3px;cursor:pointer}
+#cmtbtn{position:fixed;display:none;z-index:40;background:var(--gold);color:#1a1510;
+border:0;border-radius:18px;padding:9px 16px;font-size:13.5px;font-weight:700;cursor:pointer;
+box-shadow:0 4px 16px rgba(0,0,0,.6);-webkit-user-select:none;user-select:none;
+touch-action:manipulation}
+#pop{position:fixed;display:none;z-index:41;width:min(320px,calc(100vw - 24px));background:var(--panel);
+border:1px solid var(--gold);border-radius:8px;padding:11px;box-shadow:0 8px 30px rgba(0,0,0,.6)}
+#pop .qz{font-size:11.5px;color:var(--dim);border-left:2px solid var(--gold);padding-left:8px;
+margin-bottom:8px;max-height:66px;overflow:auto;line-height:1.6}
+#pop textarea{width:100%;height:76px;background:#0e0c0a;border:1px solid var(--line);
+color:var(--fg);border-radius:5px;padding:7px;font-size:13px;font-family:inherit;resize:vertical}
+#pop .row{display:flex;gap:7px;justify-content:flex-end;margin-top:8px}
+#panel{position:fixed;right:0;top:0;width:340px;height:100vh;background:var(--panel);
+border-left:1px solid var(--line);transform:translateX(100%);transition:transform .18s;
+z-index:30;display:flex;flex-direction:column}
+#panel.open{transform:none}
+body.pan #main{padding-right:340px}
+@media(max-width:900px){#panel{width:100%}body.pan #main{padding-right:0}}
+#panel .ph{padding:14px 16px 8px;font-size:14px;border-bottom:1px solid var(--line);
+display:flex;align-items:center;gap:8px}
+#panel .ph .sp{flex:1}
+#plist{flex:1;overflow-y:auto;padding:8px 12px 20px}
+#panel .pf{border-top:1px solid var(--line);padding:10px 12px;display:flex;gap:7px;flex-wrap:wrap}
+.nitem{background:#231f1b;border:1px solid var(--line);border-left:2px solid var(--gold);
+border-radius:6px;padding:9px 10px;margin-bottom:9px;cursor:pointer}
+.nitem:hover{background:#2b2621}
+.nitem .nh{font-size:10.5px;color:var(--gold);margin-bottom:4px;display:flex;gap:6px}
+.nitem .nh .sp{flex:1}
+.nitem .nq{font-size:11.5px;color:var(--dim);line-height:1.6;margin-bottom:5px;
+border-left:2px solid var(--line);padding-left:7px}
+.nitem .nn{font-size:13px;line-height:1.65;white-space:pre-wrap}
+.nitem .del{color:var(--del);font-size:11px;background:none;border:0;padding:0;cursor:pointer}
+.warn{color:#d8a33a;font-size:11px;padding:0 16px 10px;line-height:1.6}
+#foot{display:flex;gap:10px;justify-content:space-between;margin-top:46px;
+border-top:1px solid var(--line);padding-top:16px}
+@media(max-width:760px){#side{position:fixed;left:-270px;transition:left .2s;z-index:20}
+#side.open{left:0}#burger{display:inline-block!important}#wrap{padding:20px 16px 100px}}
+#burger{display:none}
+
+#gate{position:fixed;inset:0;z-index:90;background:#0d0b09;display:flex;
+align-items:center;justify-content:center;padding:20px}
+#gate .gbox{width:min(360px,100%);background:var(--panel);border:1px solid var(--line);
+border-radius:10px;padding:22px 20px 18px}
+#gate h2{font-size:18px;margin:0 0 6px}
+#gate .gsub{font-size:12.5px;color:var(--dim);margin:0 0 18px;line-height:1.7}
+#gate label{display:block;font-size:11.5px;color:var(--gold);margin:12px 0 5px}
+#gate label span{color:var(--dim)}
+#gate input[type=text],#gate input[type=password],#gate #gname{width:100%;padding:9px 10px;
+background:#0e0c0a;border:1px solid var(--line);color:var(--fg);border-radius:6px;
+font-size:15px;font-family:inherit}
+#gate .gchk{display:flex;align-items:center;gap:7px;color:var(--dim);margin:14px 0 0;font-size:12px}
+#gate .gchk input{width:auto}
+#gate button{width:100%;margin-top:16px;padding:11px;font-size:14px;border-radius:6px}
+#gate .gmsg{min-height:18px;margin-top:10px;font-size:12px;color:#d8a33a;line-height:1.6}
+#gate .gfoot{font-size:11px;color:#6d645b;line-height:1.7;margin:16px 0 0;
+border-top:1px solid var(--line);padding-top:12px}
+body.locked{overflow:hidden}
+</style></head><body class="locked">
+
+<div id="gate">
+  <div class="gbox">
+    <h2>카를라 — 0~30화 검토본</h2>
+    <p class="gsub">테스트 독자 전용입니다. 받으신 암호를 넣어 주세요.</p>
+    <label>이름 <span>(코멘트에 함께 남습니다)</span></label>
+    <input id="gname" placeholder="예: 진우" autocomplete="nickname">
+    <label>암호</label>
+    <input id="gpw" type="password" placeholder="전달받은 암호" autocomplete="current-password">
+    <label class="gchk"><input type="checkbox" id="gsave" checked> 이 기기에서 다음에 자동으로 열기</label>
+    <button class="act" id="gbtn">열기</button>
+    <div class="gmsg" id="gmsg"></div>
+    <p class="gfoot">원고는 암호로 잠겨 있어, 암호 없이는 서버 파일을 받아도 읽을 수 없습니다.
+    읽으신 내용은 공개 전 원고이니 바깥으로 옮기지 말아 주세요.</p>
+  </div>
+</div>
+
+<aside id="side">
+  <h1>카를라 검수 카드<small>0~30화 · 테스트 독자용</small></h1>
+  <input id="q" placeholder="본문 검색…">
+  <div id="nav"></div>
+</aside>
+<main id="main">
+  <div id="bar">
+    <button id="burger" onclick="side.classList.toggle('open')">☰</button>
+    <button id="bBody" class="act" onclick="setView('body')">본문</button>
+    <button id="bRec" onclick="setView('rec')">수정기록</button>
+    <button id="bClean" onclick="toggleClean()">마크업 끄기</button>
+    <span class="sp"></span>
+    <span class="cnt" id="cnt"></span>
+    <button id="bAdd" title="선택한 문장에 코멘트">＋ 선택 부분</button>
+    <button id="bCmt" onclick="togglePanel()">코멘트 0</button>
+    <button id="bDone" onclick="toggleDone()">검토 완료 표시</button>
+  </div>
+  <div id="wrap">
+    <h2 class="tit" id="tit"></h2>
+    <div class="stat" id="stat"></div>
+    <div class="metabox" id="metabox"></div>
+    <div id="doc"></div>
+    <div id="foot">
+      <button onclick="go(-1)">← 이전 화</button>
+      <button onclick="go(1)">다음 화 →</button>
+    </div>
+  </div>
+</main>
+<button id="cmtbtn">＋ 코멘트 달기</button>
+<div id="pop">
+  <div class="qz" id="pop_q"></div>
+  <textarea id="pop_t" placeholder="수정이 필요한 이유를 적어 주세요…"></textarea>
+  <div class="row">
+    <button onclick="hidePop()">취소</button>
+    <button class="act" id="bSave" title="⌘/Ctrl+Enter">코멘트 달기</button>
+  </div>
+</div>
+<aside id="panel">
+  <div class="ph"><b>검토 코멘트</b><span class="sp"></span>
+    <button onclick="togglePanel()">닫기</button></div>
+  <div class="warn">코멘트는 이 기기에 자동으로 저장되고, 잠시 뒤 작가에게 자동으로 전송됩니다.
+  창을 닫았다 다시 열어도 그대로 남아 있습니다.</div>
+  <div class="warn" id="sendmsg" style="padding-top:0"></div>
+  <div class="warn" id="svmsg" style="padding-top:0;display:none"></div>
+  <div id="plist"></div>
+  <div class="pf">
+    <button class="act" onclick="exportNotes()">내보내기 (.md)</button>
+    <button onclick="copyNotes()">전체 복사</button>
+    <button onclick="ifile.click()">불러오기</button>
+    <button class="act" id="bSend" onclick="sendNow(1)">지금 보내기</button>
+    <button onclick="clearNotes()">전체 삭제</button>
+    <input type="file" id="ifile" accept=".md,.txt,.json" style="display:none"
+           onchange="importNotes(this.files[0]);this.value='';">
+    <div id="imsg" style="width:100%;font-size:11px;color:var(--gold)"></div>
+  </div>
+</aside>
+<script>
+let CARDS=[], ACTS=[];
+const done=new Set(); let cur=0, view='body', clean=false;
+const nav=document.getElementById('nav'), side=document.getElementById('side');
+function buildNav(){
+  nav.innerHTML='';
+  ACTS.forEach(a=>{
+    const list=CARDS.map((c,i)=>[c,i]).filter(([c])=>c.act===a);
+    if(!list.length)return;
+    const h=document.createElement('div');h.className='actname';h.textContent=a;nav.appendChild(h);
+    list.forEach(([c,i])=>{
+      const d=document.createElement('div');d.className='it';d.dataset.i=i;
+      d.innerHTML='<span class="no">'+c.id+'화</span><span class="tt"></span>'
+        +'<span class="dot">'+(c.ndel||'')+'</span>';
+      d.querySelector('.tt').textContent=c.title.replace(/^[^—]*—\s*/,'');
+      d.onclick=()=>{show(i);side.classList.remove('open')};
+      nav.appendChild(d);
+    });
+  });
+  paint();
+}
+function paint(){
+  document.querySelectorAll('.it').forEach(d=>{
+    const i=+d.dataset.i;
+    d.classList.toggle('on',i===cur);
+    d.classList.toggle('done',done.has(CARDS[i].id));
+    const k=notes.filter(n=>n.ci===i).length;
+    d.querySelector('.dot').textContent=k?'✎'+k:(CARDS[i].ndel||'');
+    d.querySelector('.dot').style.color=k?'var(--gold)':'';
+  });
+  document.getElementById('cnt').textContent='검토 완료 '+done.size+' / '+CARDS.length;
+  document.getElementById('bDone').classList.toggle('act',done.has(CARDS[cur].id));
+  const bc=document.getElementById('bCmt');
+  bc.textContent='코멘트 '+notes.length+(dirty?' ●':'');
+  bc.classList.toggle('act',notes.length>0);
+  bc.title=dirty?'저장되지 않은 코멘트가 있습니다 — 패널에서 내보내기 하세요':'';
+  const sv=document.getElementById('svmsg');
+  if(sv)sv.textContent=notes.length
+    ? (dirty?'⚠ 아직 파일로 저장하지 않았습니다 ('+notes.length+'건)':'✓ '+notes.length+'건 저장됨')
+    : '';
+}
+function show(i){
+  cur=i; const c=CARDS[i];
+  document.getElementById('tit').textContent=c.title;
+  document.getElementById('stat').innerHTML=
+    '본문 <b>'+c.chars.toLocaleString()+'자</b> · 삭제 제안 <b>'+c.ndel+'</b>건 · 대체 <b>'
+    +c.nins+'</b>건 · <code>'+c.src+'</code>';
+  document.getElementById('metabox').innerHTML=c.meta.join('<br>');
+  render(); paint(); document.getElementById('main').scrollTop=0;
+}
+function render(){
+  const c=CARDS[cur];
+  document.getElementById('doc').innerHTML=(view==='body'?c.body:c.rec);
+  hl(); applyNotes();
+}
+function setView(v){
+  view=v;
+  document.getElementById('bBody').classList.toggle('act',v==='body');
+  document.getElementById('bRec').classList.toggle('act',v==='rec');
+  render();
+}
+function toggleClean(){
+  clean=!clean; document.body.classList.toggle('clean',clean);
+  const b=document.getElementById('bClean');
+  b.classList.toggle('act',clean); b.textContent=clean?'마크업 켜기':'마크업 끄기';
+}
+function toggleDone(){
+  const id=CARDS[cur].id;
+  done.has(id)?done.delete(id):done.add(id); paint();
+}
+function go(d){ const n=cur+d; if(n>=0&&n<CARDS.length) show(n); }
+const q=document.getElementById('q');
+q.oninput=()=>{
+  const t=q.value.trim().toLowerCase();
+  document.querySelectorAll('.it').forEach(d=>{
+    const c=CARDS[+d.dataset.i];
+    d.classList.toggle('hid', !!t && !c.search.includes(t));
+  });
+  hl();
+};
+function hl(){
+  const t=q.value.trim(); if(!t) return;
+  const doc=document.getElementById('doc');
+  const w=document.createTreeWalker(doc,NodeFilter.SHOW_TEXT), ns=[];
+  while(w.nextNode()) ns.push(w.currentNode);
+  const rx=new RegExp(t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+  ns.forEach(n=>{
+    if(!rx.test(n.nodeValue))return; rx.lastIndex=0;
+    const sp=document.createElement('span');
+    sp.innerHTML=n.nodeValue.replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]))
+      .replace(rx,m=>'<mark>'+m+'</mark>');
+    n.parentNode.replaceChild(sp,n);
+  });
+}
+/* ---------- 드래그 코멘트 ---------- */
+const notes=[]; let nid=1, pend=null, dirty=false;
+const DOC=document.getElementById('doc'), BTN=document.getElementById('cmtbtn'),
+      POP=document.getElementById('pop'), PANEL=document.getElementById('panel');
+const blocks=()=>Array.from(DOC.querySelectorAll('p,td,li,h3,h4,h5,blockquote'));
+
+function checkSel(){
+  if(POP.style.display==='block')return;
+  const s=window.getSelection();
+  if(!s||!s.rangeCount||s.isCollapsed||!s.toString().trim()){pend=null;hideBtn();return;}
+  const r=s.getRangeAt(0);
+  if(!DOC.contains(r.commonAncestorContainer)){pend=null;hideBtn();return;}
+  const sc=r.startContainer;
+  const el=(sc.nodeType===3?sc.parentElement:sc).closest('p,td,li,h3,h4,h5,blockquote');
+  if(!el){hideBtn();return;}
+  pend={quote:s.toString().trim(), pidx:blocks().indexOf(el)};
+  const rc=r.getBoundingClientRect();
+  BTN.style.display='block';
+  const bw=BTN.offsetWidth||110, bh=BTN.offsetHeight||34;
+  let top=rc.bottom+12;
+  if(top+bh>innerHeight-10)top=Math.max(10,rc.top-bh-12);
+  BTN.style.left=Math.max(8,Math.min(rc.left+rc.width/2-bw/2,innerWidth-bw-8))+'px';
+  BTN.style.top=top+'px';
+}
+let selT=null;
+const askSel=(d)=>{clearTimeout(selT);selT=setTimeout(checkSel,d);};
+document.addEventListener('selectionchange',()=>askSel(260));
+DOC.addEventListener('mouseup',()=>askSel(10));
+DOC.addEventListener('touchend',()=>askSel(300));
+DOC.addEventListener('mousedown',()=>{if(POP.style.display!=='block')hideBtn();});
+document.getElementById('main').addEventListener('scroll',()=>{
+  if(POP.style.display!=='block')hideBtn();
+},{passive:true});
+document.getElementById('bSave').addEventListener('pointerdown',e=>{
+  e.preventDefault(); saveNote();
+},{passive:false});
+const BADD=document.getElementById('bAdd');
+['pointerdown','touchstart'].forEach(ev=>{
+  BADD.addEventListener(ev,e=>{
+    e.preventDefault(); e.stopPropagation();
+    checkSel();
+    if(!pend||POP.style.display==='block'){
+      alertBox2('먼저 본문에서 문장을 길게 눌러 선택해 주세요.');return;
+    }
+    openPop();
+  },{passive:false});
+});
+function alertBox2(m){
+  const t=document.getElementById('bAdd'), o=t.textContent;
+  t.textContent=m; t.style.maxWidth='none';
+  setTimeout(()=>{t.textContent=o;},2600);
+}
+let opening=false;
+['pointerdown','touchstart','click'].forEach(ev=>{
+  BTN.addEventListener(ev,e=>{
+    e.preventDefault(); e.stopPropagation();
+    if(opening)return;
+    opening=true; openPop(); setTimeout(()=>{opening=false;},400);
+  },{passive:false});
+});
+
+function hideBtn(){BTN.style.display='none';}
+function hidePop(){POP.style.display='none';document.getElementById('pop_t').value='';}
+function openPop(){
+  if(!pend)return;
+  hideBtn();
+  document.getElementById('pop_q').textContent=pend.quote.slice(0,220);
+  POP.style.display='block';
+  const w=POP.offsetWidth,h=POP.offsetHeight;
+  const bl=parseFloat(BTN.style.left)||0, bt=parseFloat(BTN.style.top)||0;
+  POP.style.left=Math.max(8,Math.min(bl+(BTN.offsetWidth||110)/2-w/2,innerWidth-w-8))+'px';
+  let t=bt+(BTN.offsetHeight||34)+8;
+  if(t+h>innerHeight-10)t=Math.max(10,innerHeight-h-10);
+  POP.style.top=t+'px';
+  document.getElementById('pop_t').focus();
+}
+function saveNote(){
+  if(!pend){hidePop();return;}
+  notes.push({id:nid++,ci:cur,view:view,pidx:pend.pidx,quote:pend.quote,
+              note:document.getElementById('pop_t').value.trim()});
+  dirty=true;
+  pend=null; hidePop(); window.getSelection().removeAllRanges();
+  render(); renderPanel(); paint();
+  if(!PANEL.classList.contains('open'))togglePanel();
+}
+document.getElementById('pop_t').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))saveNote();
+  if(e.key==='Escape')hidePop();
+});
+function applyNotes(){
+  const bs=blocks();
+  notes.filter(n=>n.ci===cur&&n.view===view).forEach(n=>{
+    const b=bs[n.pidx]; if(!b)return;
+    if(!markIn(b,n.quote,n.id)){
+      b.classList.add('cmtblk'); b.dataset.nid=String(n.id);
+      b.addEventListener('click',()=>focusNote(n.id));
+    }
+  });
+}
+function markIn(el,q,id){
+  const first=q.split('\n')[0].trim();
+  if(!first)return false;
+  const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT),ns=[];
+  while(w.nextNode())ns.push(w.currentNode);
+  for(const n of ns){
+    if(n.parentElement.classList.contains('cmt'))continue;
+    const i=n.nodeValue.indexOf(first);
+    if(i<0)continue;
+    const t=n.splitText(i); t.splitText(first.length);
+    const sp=document.createElement('span');
+    sp.className='cmt'; sp.dataset.nid=String(id); sp.title='코멘트 보기';
+    t.parentNode.replaceChild(sp,t); sp.appendChild(t);
+    sp.addEventListener('click',ev=>{ev.stopPropagation();focusNote(id);});
+    return true;
+  }
+  return false;
+}
+function focusNote(id){
+  if(!PANEL.classList.contains('open'))togglePanel();
+  document.querySelectorAll('#plist .nitem').forEach(d=>{
+    d.style.outline = (+d.dataset.nid===id)?'1px solid var(--gold)':'';
+    if(+d.dataset.nid===id)d.scrollIntoView({block:'center'});
+  });
+}
+function jumpNote(id){
+  const n=notes.find(x=>x.id===id); if(!n)return;
+  if(n.ci!==cur)show(n.ci);
+  if(n.view!==view)setView(n.view);
+  const t=DOC.querySelector('[data-nid="'+id+'"]');
+  if(t)t.scrollIntoView({block:'center',behavior:'smooth'});
+}
+function delNote(id){
+  const i=notes.findIndex(x=>x.id===id);
+  if(i>=0){notes.splice(i,1);dirty=true;}
+  render(); renderPanel(); paint();
+}
+function clearNotes(){ notes.length=0; dirty=false; render(); renderPanel(); paint(); }
+function togglePanel(){
+  PANEL.classList.toggle('open');
+  document.body.classList.toggle('pan',PANEL.classList.contains('open'));
+}
+function renderPanel(){
+  const L=document.getElementById('plist');
+  if(!notes.length){L.innerHTML='<p class="warn">아직 코멘트가 없습니다. 본문에서 문장을 끌어 선택하면 「＋ 코멘트」 단추가 뜹니다.</p>';return;}
+  L.innerHTML='';
+  notes.slice().sort((a,b)=>a.ci-b.ci||a.id-b.id).forEach(n=>{
+    const c=CARDS[n.ci];
+    const d=document.createElement('div');
+    d.className='nitem'; d.dataset.nid=String(n.id);
+    const hd=document.createElement('div'); hd.className='nh';
+    hd.innerHTML='<span>'+c.id+'화 · '+(n.view==='body'?'본문':'수정기록')
+      +'</span><span class="sp"></span>';
+    const x=document.createElement('button'); x.className='del'; x.textContent='삭제';
+    x.addEventListener('click',ev=>{ev.stopPropagation();delNote(n.id);});
+    hd.appendChild(x);
+    const qq=document.createElement('div'); qq.className='nq';
+    qq.textContent=n.quote.length>120?n.quote.slice(0,120)+'…':n.quote;
+    const nn=document.createElement('div'); nn.className='nn';
+    nn.textContent=n.note||'(내용 없음)';
+    d.appendChild(hd); d.appendChild(qq); d.appendChild(nn);
+    d.addEventListener('click',()=>jumpNote(n.id));
+    L.appendChild(d);
+  });
+}
+function noteText(){
+  let out='# 검토 코멘트 — 카를라 0~30화 검수본\n\n';
+  const by={};
+  notes.forEach(n=>{(by[n.ci]=by[n.ci]||[]).push(n);});
+  Object.keys(by).map(Number).sort((a,b)=>a-b).forEach(k=>{
+    const c=CARDS[k];
+    out+='## '+c.title+'  `'+c.src+'`\n\n';
+    by[k].forEach((n,i)=>{
+      out+='**'+(i+1)+'. '+(n.view==='body'?'본문':'수정기록')+'**\n\n';
+      out+='> '+n.quote.replace(/\n+/g,'\n> ')+'\n\n';
+      out+=(n.note||'(내용 없음)')+'\n\n';
+    });
+  });
+  out+='---\n\n<!-- 아래 블록은 뷰어가 다시 읽어들이는 데이터입니다. 지우지 마세요. -->\n\n';
+  out+='```json\n'+JSON.stringify(notes.map(n=>({card:CARDS[n.ci].id,view:n.view,
+        pidx:n.pidx,quote:n.quote,note:n.note})),null,1)+'\n```\n';
+  return out;
+}
+function importNotes(f){
+  if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    const m=String(rd.result).match(/```json\s*([\s\S]*?)```/);
+    if(!m){alertBox('이 파일에서 코멘트 데이터를 찾지 못했습니다.');return;}
+    let arr; try{arr=JSON.parse(m[1]);}catch(e){alertBox('코멘트 데이터를 읽지 못했습니다.');return;}
+    let n2=0;
+    arr.forEach(o=>{
+      const ci=CARDS.findIndex(c=>c.id===o.card);
+      if(ci<0)return;
+      notes.push({id:nid++,ci:ci,view:o.view||'body',pidx:o.pidx,
+                  quote:o.quote||'',note:o.note||''});
+      n2++;
+    });
+    render(); renderPanel(); paint();
+    if(!PANEL.classList.contains('open'))togglePanel();
+    alertBox(n2+'건을 불러왔습니다.');
+  };
+  rd.readAsText(f);
+}
+function alertBox(msg){
+  const w=document.getElementById('imsg');
+  w.textContent=msg; setTimeout(()=>{w.textContent='';},4000);
+}
+function exportNotes(){
+  if(!notes.length)return;
+  const b=new Blob([noteText()],{type:'text/markdown;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(b); a.download='검토코멘트_0-30화.md';
+  document.body.appendChild(a); a.click(); a.remove(); dirty=false; paint();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+function copyNotes(){
+  if(!notes.length)return;
+  const t=noteText(), ta=document.createElement('textarea');
+  ta.value=t; document.body.appendChild(ta); ta.select();
+  try{document.execCommand('copy');}catch(e){}
+  ta.remove();
+  if(navigator.clipboard)navigator.clipboard.writeText(t).catch(()=>{});
+  dirty=false; paint();
+  const b=event&&event.target; if(b){const o=b.textContent;b.textContent='복사됨';
+    setTimeout(()=>{b.textContent=o;},1200);}
+}
+/* 자동 저장되므로 이탈 경고 불필요 */
+
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  if(e.key==='ArrowLeft')go(-1);
+  if(e.key==='ArrowRight')go(1);
+  if(e.key==='c')toggleClean();
+  if(e.key==='r')setView(view==='body'?'rec':'body');
+  if(e.key==='x')toggleDone();
+});
+/* boot() 에서 호출 */
+</script>
+<script src="config.js"></script>
+<script>
+/* ================= 사이트 모드 ================= */
+const LS_N='carla_notes_v1', LS_R='carla_reader_v1', LS_P='carla_pw_v1';
+const COLLECT=(window.COLLECT_URL||'').trim();
+let READER='', sendT=null, lastSent='';
+
+function gmsg(m,ok){const e=document.getElementById('gmsg');e.textContent=m;
+  e.style.color=ok?'var(--ins)':'#d8a33a';}
+
+async function unlock(pw){
+  const res=await fetch('d.bin',{cache:'no-cache'});
+  if(!res.ok) throw new Error('원고 파일을 불러오지 못했습니다 ('+res.status+')');
+  const b=new Uint8Array(await res.arrayBuffer());
+  const salt=b.slice(0,16), iv=b.slice(16,28), ct=b.slice(28);
+  const km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
+  const key=await crypto.subtle.deriveKey(
+    {name:'PBKDF2',salt:salt,iterations:250000,hash:'SHA-256'},
+    km,{name:'AES-GCM',length:256},false,['decrypt']);
+  let pt;
+  try{ pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:iv},key,ct); }
+  catch(e){ const err=new Error('암호가 맞지 않습니다.'); err.bad=1; throw err; }
+  let txt;
+  if(typeof DecompressionStream==='function'){
+    txt=await new Response(new Blob([pt]).stream()
+      .pipeThrough(new DecompressionStream('gzip'))).text();
+  }else{
+    throw new Error('브라우저가 오래되어 열 수 없습니다. 크롬이나 삼성인터넷 최신 버전을 써 주세요.');
+  }
+  const o=JSON.parse(txt);
+  CARDS=o.cards; ACTS=o.acts;
+}
+
+async function tryOpen(pw,remember,quiet){
+  if(!pw){gmsg('암호를 넣어 주세요.');return false;}
+  const btn=document.getElementById('gbtn');
+  btn.disabled=true; if(!quiet)gmsg('여는 중…');
+  try{
+    await unlock(pw);
+  }catch(e){
+    btn.disabled=false;
+    if(e.bad){ try{localStorage.removeItem(LS_P);}catch(_){} }
+    gmsg(e.message||'열지 못했습니다.');
+    return false;
+  }
+  try{
+    if(remember)localStorage.setItem(LS_P,pw); else localStorage.removeItem(LS_P);
+    localStorage.setItem(LS_R,READER);
+  }catch(_){}
+  boot();
+  return true;
+}
+
+function boot(){
+  restoreNotes();
+  buildNav(); show(0); renderPanel(); paint();
+  document.getElementById('gate').remove();
+  document.body.classList.remove('locked');
+}
+
+/* ---------- 저장 ---------- */
+function packNotes(){
+  return notes.map(n=>({card:CARDS[n.ci]?CARDS[n.ci].id:'?',view:n.view,
+    pidx:n.pidx,quote:n.quote,note:n.note}));
+}
+function persist(){
+  try{ localStorage.setItem(LS_N,JSON.stringify({reader:READER,at:Date.now(),notes:packNotes()})); }
+  catch(_){}
+}
+function restoreNotes(){
+  let raw=null; try{ raw=localStorage.getItem(LS_N); }catch(_){}
+  if(!raw)return;
+  let o; try{ o=JSON.parse(raw); }catch(_){ return; }
+  (o.notes||[]).forEach(x=>{
+    const ci=CARDS.findIndex(c=>c.id===x.card);
+    if(ci<0)return;
+    notes.push({id:nid++,ci:ci,view:x.view||'body',pidx:x.pidx,
+                quote:x.quote||'',note:x.note||''});
+  });
+  lastSent=JSON.stringify(packNotes());
+}
+
+/* ---------- 자동 전송 ---------- */
+function smsg(m,cls){
+  const e=document.getElementById('sendmsg'); if(!e)return;
+  e.textContent=m; e.style.color=cls==='ok'?'var(--ins)':(cls==='err'?'var(--del)':'#d8a33a');
+}
+function hhmm(){const d=new Date();
+  return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
+
+async function sendNow(manual){
+  if(!COLLECT){ if(manual)smsg('전송 주소가 아직 설정되지 않았습니다. 내보내기(.md)를 써 주세요.','err');
+    return; }
+  const body=JSON.stringify(packNotes());
+  if(!manual && body===lastSent) return;
+  if(!notes.length && !manual) return;
+  smsg('보내는 중…');
+  const wire=JSON.stringify({reader:READER||'(이름 없음)',ts:new Date().toISOString(),
+    ua:navigator.userAgent,count:notes.length,notes:JSON.parse(body),text:noteText()});
+  const opt={method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:wire};
+  try{
+    let ok=false;
+    try{
+      const r=await fetch(COLLECT,opt);
+      if(!r.ok) throw new Error(r.status);
+      ok=true;
+    }catch(e1){
+      /* CORS 응답 헤더가 없는 경우를 대비한 무응답 전송 */
+      await fetch(COLLECT,Object.assign({mode:'no-cors'},opt));
+      ok=true;
+    }
+    if(!ok) throw new Error('fail');
+    lastSent=body;
+    smsg('✓ '+hhmm()+' 작가에게 전송됨 ('+notes.length+'건)','ok');
+  }catch(e){
+    smsg('전송하지 못했습니다 — 이 기기에는 저장돼 있습니다. 잠시 뒤 다시 시도합니다.','err');
+    clearTimeout(sendT); sendT=setTimeout(()=>sendNow(0),30000);
+  }
+}
+function scheduleSend(){
+  clearTimeout(sendT); sendT=setTimeout(()=>sendNow(0),6000);
+  if(COLLECT&&notes.length)smsg('곧 자동으로 전송됩니다…');
+}
+
+/* paint() 를 가로채 저장·전송을 건다 */
+const _paint=paint;
+paint=function(){ _paint.apply(this,arguments); persist(); scheduleSend(); };
+
+document.addEventListener('visibilitychange',()=>{ if(document.hidden)sendNow(0); });
+window.addEventListener('pagehide',()=>{
+  persist();
+  if(COLLECT&&notes.length&&JSON.stringify(packNotes())!==lastSent&&navigator.sendBeacon){
+    try{ navigator.sendBeacon(COLLECT,new Blob([JSON.stringify({
+      reader:READER||'(이름 없음)',ts:new Date().toISOString(),ua:navigator.userAgent,
+      count:notes.length,notes:packNotes(),text:noteText()})],{type:'text/plain;charset=utf-8'})); }catch(_){}
+  }
+});
+
+/* ---------- 게이트 기동 ---------- */
+(function(){
+  const gn=document.getElementById('gname'), gp=document.getElementById('gpw'),
+        gs=document.getElementById('gsave'), gb=document.getElementById('gbtn');
+  try{ gn.value=localStorage.getItem(LS_R)||''; }catch(_){}
+  const go=()=>{ READER=gn.value.trim(); tryOpen(gp.value,gs.checked,false); };
+  gb.addEventListener('click',go);
+  [gn,gp].forEach(el=>el.addEventListener('keydown',e=>{ if(e.key==='Enter')go(); }));
+  let saved=null; try{ saved=localStorage.getItem(LS_P); }catch(_){}
+  if(saved){
+    READER=gn.value.trim(); gmsg('여는 중…');
+    tryOpen(saved,true,true).then(ok=>{ if(!ok)gmsg('암호를 다시 넣어 주세요.'); });
+  }else{ setTimeout(()=>gn.focus(),120); }
+})();
+</script>
+</body></html>
