@@ -533,7 +533,8 @@ document.addEventListener('keydown',e=>{
 <script src="config.js"></script>
 <script>
 /* ================= 사이트 모드 ================= */
-const LS_N='carla_notes_v1', LS_R='carla_reader_v1', LS_P='carla_pw_v1';
+const LS_N='carla_notes_v1', LS_R='carla_reader_v1', LS_P='carla_pw_v1',
+      LS_C='carla_card_v1', LS_S='carla_scroll_v1';
 const COLLECT=(window.COLLECT_URL||'').trim();
 let READER='', sendT=null, lastSent='';
 
@@ -583,11 +584,38 @@ async function tryOpen(pw,remember,quiet){
   return true;
 }
 
+/* ---------- 읽던 자리 복원 (안드로이드 위치 튐 대응) ---------- */
+const _showBase = show;
+show = function(i){
+  _showBase(i);
+  try{ if(CARDS[i]) localStorage.setItem(LS_C, CARDS[i].id); }catch(_){}
+  try{ localStorage.removeItem(LS_S); }catch(_){}
+};
+function mainEl(){ return document.getElementById('main'); }
+function rememberScroll(){
+  const m=mainEl(); if(!m)return;
+  try{ localStorage.setItem(LS_S, String(m.scrollTop||0)); }catch(_){}
+}
+function startCard(){
+  let cid=null; try{ cid=localStorage.getItem(LS_C); }catch(_){}
+  if(!cid) return 0;
+  const k=CARDS.findIndex(c=>c.id===cid);
+  return k>=0?k:0;
+}
+
 function boot(){
   restoreNotes();
-  buildNav(); show(0); renderPanel(); paint();
+  const si=startCard();
+  let sy=0; try{ sy=parseInt(localStorage.getItem(LS_S)||'0',10)||0; }catch(_){}
+  buildNav(); show(si); renderPanel(); paint();
   document.getElementById('gate').remove();
   document.body.classList.remove('locked');
+  if(sy>0) setTimeout(()=>{ const m=mainEl(); if(m)m.scrollTop=sy; }, 60);
+  const m0=mainEl();
+  if(m0) m0.addEventListener('scroll', ()=>{ clearTimeout(window._sct);
+    window._sct=setTimeout(rememberScroll,300); }, {passive:true});
+  window.addEventListener('pagehide', rememberScroll);
+  document.addEventListener('visibilitychange', ()=>{ if(document.hidden) rememberScroll(); });
 }
 
 /* ---------- 저장 ---------- */
