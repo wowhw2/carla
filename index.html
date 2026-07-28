@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
 <meta name="referrer" content="no-referrer">
-<title>카를라 0~30화 검수 카드</title>
+<title>카를라 0~31화 검수 카드</title>
 <style>
 :root{--bg:#12100e;--panel:#1b1815;--line:#332e28;--fg:#e8e1d6;--dim:#9a9086;
 --gold:#c9a227;--del:#c85a4a;--ins:#6fae7a;}
@@ -128,7 +128,7 @@ body.locked{overflow:hidden}
 
 <div id="gate">
   <div class="gbox">
-    <h2>카를라 — 0~30화 검토본</h2>
+    <h2>카를라 — 0~31화 검토본</h2>
     <p class="gsub">테스트 독자 전용입니다. 받으신 암호를 넣어 주세요.</p>
     <label>이름 <span>(코멘트에 함께 남습니다)</span></label>
     <input id="gname" placeholder="예: 진우" autocomplete="nickname">
@@ -143,7 +143,7 @@ body.locked{overflow:hidden}
 </div>
 
 <aside id="side">
-  <h1>카를라 검수 카드<small>0~30화 · 테스트 독자용</small></h1>
+  <h1>카를라 검수 카드<small>0~31화 · 테스트 독자용</small></h1>
   <input id="q" placeholder="본문 검색…">
   <div id="nav"></div>
 </aside>
@@ -457,7 +457,7 @@ function renderPanel(){
   });
 }
 function noteText(){
-  let out='# 검토 코멘트 — 카를라 0~30화 검수본\n\n';
+  let out='# 검토 코멘트 — 카를라 0~31화 검수본\n\n';
   const by={};
   notes.forEach(n=>{(by[n.ci]=by[n.ci]||[]).push(n);});
   Object.keys(by).map(Number).sort((a,b)=>a-b).forEach(k=>{
@@ -503,7 +503,7 @@ function exportNotes(){
   if(!notes.length)return;
   const b=new Blob([noteText()],{type:'text/markdown;charset=utf-8'});
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(b); a.download='검토코멘트_0-30화.md';
+  a.href=URL.createObjectURL(b); a.download='검토코멘트_0-31화.md';
   document.body.appendChild(a); a.click(); a.remove(); dirty=false; paint();
   setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
