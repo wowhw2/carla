@@ -202,6 +202,26 @@ body.locked{overflow:hidden}
 let CARDS=[], ACTS=[];
 const done=new Set(); let cur=0, view='body', clean=false;
 const nav=document.getElementById('nav'), side=document.getElementById('side');
+/* ---------- 유령 클릭 차단 ----------
+   모바일에서 pointerdown 으로 처리한 단추(코멘트 달기 등)를 누르면,
+   그 뒤에 click 이 한 번 더 날아가 방금 그 자리에 새로 나타난 요소를 눌러 버린다.
+   → (1) 눌러서 시작한 지점을 기억해 두고 다른 곳에서 시작한 click 은 무시하고
+     (2) 저장 직후 짧은 시간 동안 click 을 통째로 삼킨다. */
+let PDOWN=null, SHIELD=0;
+['pointerdown','mousedown','touchstart'].forEach(ev=>{
+  document.addEventListener(ev,e=>{PDOWN=e.target||null;},true);
+});
+document.addEventListener('click',e=>{
+  if(Date.now()<SHIELD){e.stopPropagation();e.preventDefault();}
+},true);
+function shield(ms){SHIELD=Date.now()+(ms||500);}
+/* 이 click 이 sel 로 지정한 요소 안에서 시작됐는지 확인. 포인터 이벤트가
+   아예 없는 환경(PDOWN===null)에서는 막지 않는다. */
+function fromHere(el,sel){
+  if(!PDOWN)return true;
+  if(!PDOWN.closest)return true;
+  return PDOWN.closest(sel)===el;
+}
 function buildNav(){
   nav.innerHTML='';
   ACTS.forEach(a=>{
@@ -213,7 +233,10 @@ function buildNav(){
       d.innerHTML='<span class="no">'+c.id+'화</span><span class="tt"></span>'
         +'<span class="dot">'+(c.ndel||'')+'</span>';
       d.querySelector('.tt').textContent=c.title.replace(/^[^—]*—\s*/,'');
-      d.onclick=()=>{show(i);side.classList.remove('open')};
+      d.addEventListener('click',()=>{
+        if(!fromHere(d,'.it'))return;
+        show(i); side.classList.remove('open');
+      });
       nav.appendChild(d);
     });
   });
@@ -369,13 +392,26 @@ function openPop(){
   document.getElementById('pop_t').focus();
 }
 function saveNote(){
+  shield(700);
   if(!pend){hidePop();return;}
+  const ci0=cur, vw0=view, sy0=(document.getElementById('main')||{}).scrollTop||0;
   notes.push({id:nid++,ci:cur,view:view,pidx:pend.pidx,quote:pend.quote,
               note:document.getElementById('pop_t').value.trim()});
   dirty=true;
   pend=null; hidePop(); window.getSelection().removeAllRanges();
   render(); renderPanel(); paint();
-  if(!PANEL.classList.contains('open'))togglePanel();
+  /* 패널이 손가락 밑에서 곧바로 열리면 뒤따라오는 click 을 받아 버린다.
+     차폐가 끝난 뒤에 연다. */
+  if(!PANEL.classList.contains('open'))setTimeout(()=>{
+    if(!PANEL.classList.contains('open'))togglePanel();
+  },320);
+  /* 최후의 안전장치: 저장 직후 화·탭이 멋대로 바뀌었다면 읽던 자리로 되돌린다. */
+  setTimeout(()=>{
+    if(cur===ci0&&view===vw0)return;
+    if(cur!==ci0)show(ci0);
+    if(view!==vw0)setView(vw0);
+    const m=document.getElementById('main'); if(m)m.scrollTop=sy0;
+  },800);
 }
 document.getElementById('pop_t').addEventListener('keydown',e=>{
   if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))saveNote();
@@ -452,7 +488,7 @@ function renderPanel(){
     const nn=document.createElement('div'); nn.className='nn';
     nn.textContent=n.note||'(내용 없음)';
     d.appendChild(hd); d.appendChild(qq); d.appendChild(nn);
-    d.addEventListener('click',()=>jumpNote(n.id));
+    d.addEventListener('click',()=>{ if(fromHere(d,'.nitem'))jumpNote(n.id); });
     L.appendChild(d);
   });
 }
