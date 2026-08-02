@@ -263,6 +263,10 @@ function paint(){
     : '';
 }
 function show(i){
+  /* 차폐 구간(코멘트 저장·패널 개폐 직후)에는 화를 옮기지 않는다.
+     안드로이드에서 패널이 닫히는 순간 뒤따라오는 유령 클릭이
+     밑에 깔린 목차를 눌러 다른 화로 튀던 문제. */
+  if(i!==cur && Date.now()<SHIELD) return;
   cur=i; const c=CARDS[i];
   document.getElementById('tit').textContent=c.title;
   document.getElementById('stat').innerHTML=
@@ -466,8 +470,11 @@ function delNote(id){
 }
 function clearNotes(){ notes.length=0; dirty=false; render(); renderPanel(); paint(); }
 function togglePanel(){
+  const wasOpen=PANEL.classList.contains('open');
   PANEL.classList.toggle('open');
   document.body.classList.toggle('pan',PANEL.classList.contains('open'));
+  /* 닫는 순간 뒤따라오는 click 한 방을 삼킨다 */
+  if(wasOpen) shield(450);
 }
 function renderPanel(){
   const L=document.getElementById('plist');
@@ -624,7 +631,8 @@ async function tryOpen(pw,remember,quiet){
 const _showBase = show;
 show = function(i){
   _showBase(i);
-  try{ if(CARDS[i]) localStorage.setItem(LS_C, CARDS[i].id); }catch(_){}
+  /* show() 가 차폐로 거절했을 수 있으므로 실제 cur 을 기록한다 */
+  try{ if(CARDS[cur]) localStorage.setItem(LS_C, CARDS[cur].id); }catch(_){}
   try{ localStorage.removeItem(LS_S); }catch(_){}
 };
 function mainEl(){ return document.getElementById('main'); }
