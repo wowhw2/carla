@@ -100,6 +100,28 @@ border-left:2px solid var(--line);padding-left:7px}
 .nitem .nn{font-size:13px;line-height:1.65;white-space:pre-wrap}
 .nitem .del{color:var(--del);font-size:11px;background:none;border:0;padding:0;cursor:pointer}
 .warn{color:#d8a33a;font-size:11px;padding:0 16px 10px;line-height:1.6}
+#epbox{margin-top:40px;border-top:1px solid var(--line);padding-top:18px}
+#epbox .eh{font-size:13px;color:var(--gold);margin-bottom:5px}
+#epbox .es{font-size:11.5px;color:var(--dim);line-height:1.75;margin-bottom:11px}
+#epta{width:100%;box-sizing:border-box;min-height:110px;resize:vertical;padding:11px 12px;
+background:#0e0c0a;border:1px solid var(--line);color:var(--fg);border-radius:7px;
+font-size:14px;line-height:1.75;font-family:inherit}
+#epta:focus{outline:none;border-color:var(--gold)}
+#eprow{display:flex;align-items:center;gap:9px;margin-top:9px}
+#eprow .sp{flex:1}
+#epmsg{font-size:11.5px;color:var(--gold)}
+#eplist{margin-top:24px}
+#eplist .elh{font-size:12px;color:var(--gold);margin-bottom:10px;
+border-top:1px solid var(--line);padding-top:15px}
+#eplist .eitem{background:#1b1815;border:1px solid var(--line);border-left:2px solid var(--gold);
+border-radius:6px;padding:10px 11px;margin-bottom:9px}
+#eplist .eitem .eq{font-size:11.5px;color:var(--dim);line-height:1.65;margin-bottom:6px;
+border-left:2px solid var(--line);padding-left:8px;cursor:pointer}
+#eplist .eitem .eq:hover{color:var(--fg)}
+#eplist .eitem .en{font-size:13.5px;line-height:1.7;white-space:pre-wrap}
+#eplist .eitem .ex{float:right;color:var(--del);font-size:11px;background:none;border:0;
+padding:0 0 0 10px;cursor:pointer}
+#eplist .none{font-size:12px;color:var(--dim);line-height:1.75}
 #foot{display:flex;gap:10px;justify-content:space-between;margin-top:46px;
 border-top:1px solid var(--line);padding-top:16px}
 @media(max-width:760px){#side{position:fixed;left:-270px;transition:left .2s;z-index:20}
@@ -164,6 +186,18 @@ body.locked{overflow:hidden}
     <div class="stat" id="stat"></div>
     <div class="metabox" id="metabox"></div>
     <div id="doc"></div>
+    <div id="epbox">
+      <div class="eh">이 화 전체에 대한 총평 · 피드백</div>
+      <div class="es">문장 단위로 짚기 어려운 것 — 전개 속도, 인물의 태도, 장면 배치, 읽고 난 인상 같은 것을
+      자유롭게 적어 주세요. 한 화에 하나씩 남고, 다시 열면 이어서 고쳐 쓸 수 있습니다.</div>
+      <textarea id="epta" placeholder="예: 중반까지는 잘 따라갔는데, 전투가 시작되고부터 누가 어디 있는지 놓쳤다…"></textarea>
+      <div id="eprow">
+        <span id="epmsg"></span><span class="sp"></span>
+        <button id="epdel" onclick="delOverall()">총평 삭제</button>
+        <button class="act" id="epsave" onclick="saveOverall()">총평 저장</button>
+      </div>
+      <div id="eplist"></div>
+    </div>
     <div id="foot">
       <button onclick="go(-1)">← 이전 화</button>
       <button onclick="go(1)">다음 화 →</button>
@@ -270,15 +304,18 @@ function show(i){
   cur=i; const c=CARDS[i];
   document.getElementById('tit').textContent=c.title;
   document.getElementById('stat').innerHTML=
-    '본문 <b>'+c.chars.toLocaleString()+'자</b> · 삭제 제안 <b>'+c.ndel+'</b>건 · 대체 <b>'
-    +c.nins+'</b>건 · <code>'+c.src+'</code>';
+    (c.key<0?'':'본문 <b>'+c.chars.toLocaleString()+'자</b> · ')
+    +(c.ndel||c.nins
+      ? '확정 이후 수정 — 버림 <b>'+c.ndel+'</b> · 넣음 <b>'+c.nins+'</b>건 · '
+      : (c.key<0?'':'✅ 확정본 · 확정 이후 수정 없음 · '))
+    +'<code>'+c.src+'</code>';
   document.getElementById('metabox').innerHTML=c.meta.join('<br>');
   render(); paint(); document.getElementById('main').scrollTop=0;
 }
 function render(){
   const c=CARDS[cur];
   document.getElementById('doc').innerHTML=(view==='body'?c.body:c.rec);
-  hl(); applyNotes();
+  hl(); applyNotes(); renderFoot();
 }
 function setView(v){
   view=v;
@@ -399,7 +436,7 @@ function saveNote(){
   shield(700);
   if(!pend){hidePop();return;}
   const ci0=cur, vw0=view, sy0=(document.getElementById('main')||{}).scrollTop||0;
-  notes.push({id:nid++,ci:cur,view:view,pidx:pend.pidx,quote:pend.quote,
+  notes.push({id:nid++,ci:cur,view:view,kind:'sel',pidx:pend.pidx,quote:pend.quote,
               note:document.getElementById('pop_t').value.trim()});
   dirty=true;
   pend=null; hidePop(); window.getSelection().removeAllRanges();
@@ -423,7 +460,7 @@ document.getElementById('pop_t').addEventListener('keydown',e=>{
 });
 function applyNotes(){
   const bs=blocks();
-  notes.filter(n=>n.ci===cur&&n.view===view).forEach(n=>{
+  notes.filter(n=>n.ci===cur&&n.view===view&&n.kind!=='ep').forEach(n=>{
     const b=bs[n.pidx]; if(!b)return;
     if(!markIn(b,n.quote,n.id)){
       b.classList.add('cmtblk'); b.dataset.nid=String(n.id);
@@ -459,6 +496,11 @@ function focusNote(id){
 function jumpNote(id){
   const n=notes.find(x=>x.id===id); if(!n)return;
   if(n.ci!==cur)show(n.ci);
+  if(n.kind==='ep'){
+    const b=document.getElementById('epbox');
+    if(b)b.scrollIntoView({block:'start',behavior:'smooth'});
+    return;
+  }
   if(n.view!==view)setView(n.view);
   const t=DOC.querySelector('[data-nid="'+id+'"]');
   if(t)t.scrollIntoView({block:'center',behavior:'smooth'});
@@ -478,26 +520,87 @@ function togglePanel(){
 }
 function renderPanel(){
   const L=document.getElementById('plist');
-  if(!notes.length){L.innerHTML='<p class="warn">아직 코멘트가 없습니다. 본문에서 문장을 끌어 선택하면 「＋ 코멘트」 단추가 뜹니다.</p>';return;}
+  if(!notes.length){L.innerHTML='<p class="warn">아직 코멘트가 없습니다.<br>· 특정 문장에 대해서는 — 본문에서 문장을 끌어 선택하면 「＋ 코멘트 달기」 단추가 뜹니다.<br>· 화 전체에 대해서는 — 본문 맨 아래 <b>「이 화 전체에 대한 총평 · 피드백」</b> 칸에 적어 주세요.</p>';return;}
   L.innerHTML='';
   notes.slice().sort((a,b)=>a.ci-b.ci||a.id-b.id).forEach(n=>{
     const c=CARDS[n.ci];
     const d=document.createElement('div');
     d.className='nitem'; d.dataset.nid=String(n.id);
     const hd=document.createElement('div'); hd.className='nh';
-    hd.innerHTML='<span>'+c.id+'화 · '+(n.view==='body'?'본문':'수정기록')
+    hd.innerHTML='<span>'+c.id+'화 · '
+      +(n.kind==='ep'?'★ 화 전체 총평':(n.view==='body'?'본문':'수정기록'))
       +'</span><span class="sp"></span>';
     const x=document.createElement('button'); x.className='del'; x.textContent='삭제';
     x.addEventListener('click',ev=>{ev.stopPropagation();delNote(n.id);});
     hd.appendChild(x);
     const qq=document.createElement('div'); qq.className='nq';
-    qq.textContent=n.quote.length>120?n.quote.slice(0,120)+'…':n.quote;
+    qq.textContent=n.kind==='ep'?'(이 화 전체에 대한 총평)'
+      :(n.quote.length>120?n.quote.slice(0,120)+'…':n.quote);
     const nn=document.createElement('div'); nn.className='nn';
     nn.textContent=n.note||'(내용 없음)';
     d.appendChild(hd); d.appendChild(qq); d.appendChild(nn);
     d.addEventListener('click',()=>{ if(fromHere(d,'.nitem'))jumpNote(n.id); });
     L.appendChild(d);
   });
+}
+/* ---------- 화 전체 총평 + 화별 코멘트 목록 (본문 하단) ---------- */
+function ovOf(ci){ return notes.find(n=>n.ci===ci&&n.kind==='ep'); }
+function epmsg2(m){
+  const e=document.getElementById('epmsg'); if(!e)return;
+  e.textContent=m; clearTimeout(window._epT);
+  window._epT=setTimeout(()=>{renderFoot();},2800);
+}
+function renderFoot(){
+  const ta=document.getElementById('epta'); if(!ta)return;
+  const box=document.getElementById('epbox');
+  /* 「작업 요약」류 카드에는 총평 칸을 두지 않는다 */
+  if(CARDS[cur]&&CARDS[cur].key<0){ box.style.display='none'; return; }
+  box.style.display='';
+  const o=ovOf(cur);
+  if(document.activeElement!==ta) ta.value=o?o.note:'';
+  document.getElementById('epdel').style.display=o?'':'none';
+  document.getElementById('epmsg').textContent=o?'이 화에 총평이 저장돼 있습니다.':'';
+  const L=document.getElementById('eplist');
+  const mine=notes.filter(n=>n.ci===cur&&n.kind!=='ep');
+  L.innerHTML='';
+  const h=document.createElement('div'); h.className='elh';
+  h.textContent='이 화에 남긴 부분 코멘트 '+mine.length+'건';
+  L.appendChild(h);
+  if(!mine.length){
+    const p=document.createElement('p'); p.className='none';
+    p.textContent='아직 없습니다. 본문에서 문장을 끌어 선택하면 「＋ 코멘트 달기」 단추가 뜹니다.';
+    L.appendChild(p); return;
+  }
+  mine.slice().sort((a,b)=>a.id-b.id).forEach(n=>{
+    const d=document.createElement('div'); d.className='eitem';
+    const x=document.createElement('button'); x.className='ex'; x.textContent='삭제';
+    x.addEventListener('click',ev=>{ev.stopPropagation();delNote(n.id);});
+    const q=document.createElement('div'); q.className='eq';
+    q.textContent=(n.view==='rec'?'[수정기록] ':'')
+      +(n.quote.length>140?n.quote.slice(0,140)+'…':n.quote);
+    q.title='본문에서 이 자리 보기';
+    q.addEventListener('click',()=>{ if(fromHere(q,'.eq'))jumpNote(n.id); });
+    const b=document.createElement('div'); b.className='en';
+    b.textContent=n.note||'(내용 없음)';
+    d.appendChild(x); d.appendChild(q); d.appendChild(b);
+    L.appendChild(d);
+  });
+}
+function saveOverall(){
+  shield(600);
+  const ta=document.getElementById('epta'), v=ta.value.trim();
+  const o=ovOf(cur);
+  if(!v){ if(o){delOverall();} else {epmsg2('내용을 적어 주세요.');} return; }
+  if(o){ o.note=v; }
+  else{ notes.push({id:nid++,ci:cur,view:'body',kind:'ep',pidx:-1,quote:'',note:v}); }
+  dirty=true; ta.blur(); renderPanel(); paint(); renderFoot();
+  epmsg2('✓ 저장했습니다.');
+}
+function delOverall(){
+  shield(600);
+  const o=ovOf(cur); if(!o)return;
+  const ta=document.getElementById('epta'); ta.value=''; ta.blur();
+  delNote(o.id); epmsg2('총평을 지웠습니다.');
 }
 function noteText(){
   let out='# 검토 코멘트 — 카를라 0~31화 검수본\n\n';
@@ -506,7 +609,12 @@ function noteText(){
   Object.keys(by).map(Number).sort((a,b)=>a-b).forEach(k=>{
     const c=CARDS[k];
     out+='## '+c.title+'  `'+c.src+'`\n\n';
-    by[k].forEach((n,i)=>{
+    const ov=by[k].filter(n=>n.kind==='ep'), se=by[k].filter(n=>n.kind!=='ep');
+    ov.forEach(n=>{
+      out+='**★ 이 화 전체에 대한 총평**\n\n';
+      out+=(n.note||'(내용 없음)')+'\n\n';
+    });
+    se.forEach((n,i)=>{
       out+='**'+(i+1)+'. '+(n.view==='body'?'본문':'수정기록')+'**\n\n';
       out+='> '+n.quote.replace(/\n+/g,'\n> ')+'\n\n';
       out+=(n.note||'(내용 없음)')+'\n\n';
@@ -514,7 +622,7 @@ function noteText(){
   });
   out+='---\n\n<!-- 아래 블록은 뷰어가 다시 읽어들이는 데이터입니다. 지우지 마세요. -->\n\n';
   out+='```json\n'+JSON.stringify(notes.map(n=>({card:CARDS[n.ci].id,view:n.view,
-        pidx:n.pidx,quote:n.quote,note:n.note})),null,1)+'\n```\n';
+        kind:n.kind||'sel',pidx:n.pidx,quote:n.quote,note:n.note})),null,1)+'\n```\n';
   return out;
 }
 function importNotes(f){
@@ -528,7 +636,7 @@ function importNotes(f){
     arr.forEach(o=>{
       const ci=CARDS.findIndex(c=>c.id===o.card);
       if(ci<0)return;
-      notes.push({id:nid++,ci:ci,view:o.view||'body',pidx:o.pidx,
+      notes.push({id:nid++,ci:ci,view:o.view||'body',kind:o.kind||'sel',pidx:o.pidx,
                   quote:o.quote||'',note:o.note||''});
       n2++;
     });
@@ -665,7 +773,7 @@ function boot(){
 /* ---------- 저장 ---------- */
 function packNotes(){
   return notes.map(n=>({card:CARDS[n.ci]?CARDS[n.ci].id:'?',view:n.view,
-    pidx:n.pidx,quote:n.quote,note:n.note}));
+    kind:n.kind||'sel',pidx:n.pidx,quote:n.quote,note:n.note}));
 }
 function persist(){
   try{ localStorage.setItem(LS_N,JSON.stringify({reader:READER,at:Date.now(),notes:packNotes()})); }
@@ -678,7 +786,7 @@ function restoreNotes(){
   (o.notes||[]).forEach(x=>{
     const ci=CARDS.findIndex(c=>c.id===x.card);
     if(ci<0)return;
-    notes.push({id:nid++,ci:ci,view:x.view||'body',pidx:x.pidx,
+    notes.push({id:nid++,ci:ci,view:x.view||'body',kind:x.kind||'sel',pidx:x.pidx,
                 quote:x.quote||'',note:x.note||''});
   });
   lastSent=JSON.stringify(packNotes());
