@@ -128,6 +128,53 @@ border-top:1px solid var(--line);padding-top:16px}
 #side.open{left:0}#burger{display:inline-block!important}#wrap{padding:20px 16px 100px}}
 #burger{display:none}
 
+:root{--ext:#7fa6d6}
+#adm{position:fixed;right:0;top:0;width:380px;height:100vh;background:var(--panel);
+border-left:1px solid var(--line);transform:translateX(100%);transition:transform .18s;
+z-index:31;display:flex;flex-direction:column}
+#adm.open{transform:none}
+body.admon #main{padding-right:380px}
+@media(max-width:900px){#adm{width:100%}body.admon #main{padding-right:0}}
+#adm .ph{padding:14px 16px 8px;font-size:14px;border-bottom:1px solid var(--line);
+display:flex;align-items:center;gap:8px}
+#adm .ph .sp{flex:1}
+#adm .ph .ax{font-size:11px;color:var(--dim);font-weight:400}
+#adm .krow{display:flex;gap:7px;padding:0 14px 12px}
+#adm .krow input{flex:1;padding:8px 9px;background:#0e0c0a;border:1px solid var(--line);
+color:var(--fg);border-radius:6px;font-size:14px;font-family:inherit}
+#admbody{flex:1;display:flex;flex-direction:column;min-height:0}
+#adm .afilt{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px 8px;
+border-bottom:1px solid var(--line)}
+#adm .afilt select,#adm .afilt input{background:#0e0c0a;border:1px solid var(--line);
+color:var(--fg);border-radius:5px;font-size:11.5px;font-family:inherit;padding:5px 7px}
+#adm .afilt select{max-width:140px}
+#adm .afilt input{flex:1 1 100%;font-size:12px;padding:6px 8px}
+#adm .achk{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--dim)}
+#adm .achk input{width:auto}
+#admlist{flex:1;overflow-y:auto;padding:8px 12px 16px}
+#admlist .ahd{font-size:11.5px;color:var(--gold);letter-spacing:.04em;
+border-top:1px solid var(--line);padding:13px 0 7px;margin-top:4px}
+#admlist .ahd:first-child{border-top:0;margin-top:0;padding-top:2px}
+.aitem{background:#1e211f00;border:1px solid var(--line);border-left:2px solid var(--ext);
+border-radius:6px;padding:9px 10px;margin-bottom:9px;cursor:pointer}
+.aitem:hover{background:#242a30}
+.aitem.ep{border-left-color:var(--gold)}
+.aitem .ah{font-size:10.5px;color:var(--ext);margin-bottom:5px;display:flex;gap:6px;
+align-items:center;flex-wrap:wrap}
+.aitem.ep .ah{color:var(--gold)}
+.aitem .ah .who{background:#2b3540;color:#cfe0f2;border-radius:3px;padding:1px 6px;font-weight:600}
+.aitem.ep .ah .who{background:#3a3116;color:#f0dcae}
+.aitem .ah .sp{flex:1}
+.aitem .ah .tm{color:#6d645b}
+.aitem .aq{font-size:11.5px;color:var(--dim);line-height:1.6;margin-bottom:5px;
+border-left:2px solid var(--line);padding-left:7px}
+.aitem .an{font-size:13px;line-height:1.7;white-space:pre-wrap}
+#adm .pf{border-top:1px solid var(--line);padding:9px 12px;display:flex;gap:7px;flex-wrap:wrap}
+.admblk{outline:1px dashed var(--ext);outline-offset:3px;border-radius:3px;position:relative}
+.admblk::after{content:"독자 " attr(data-adm);position:absolute;right:-2px;top:-16px;
+font-size:9.5px;color:var(--ext);letter-spacing:.02em}
+.admflash{background:#24384d;transition:background 1.2s}
+
 #gate{position:fixed;inset:0;z-index:90;background:#0d0b09;display:flex;
 align-items:center;justify-content:center;padding:20px}
 #gate .gbox{width:min(360px,100%);background:var(--panel);border:1px solid var(--line);
@@ -179,6 +226,7 @@ body.locked{overflow:hidden}
     <span class="cnt" id="cnt"></span>
     <button id="bAdd" title="선택한 문장에 코멘트">＋ 선택 부분</button>
     <button id="bCmt" onclick="togglePanel()">코멘트 0</button>
+    <button id="bAdm" onclick="admToggle()" style="display:none">모아보기</button>
     <button id="bDone" onclick="toggleDone()">검토 완료 표시</button>
   </div>
   <div id="wrap">
@@ -204,6 +252,35 @@ body.locked{overflow:hidden}
     </div>
   </div>
 </main>
+
+<aside id="adm">
+  <div class="ph"><b>모아보기</b><span class="ax" id="admcnt"></span><span class="sp"></span>
+    <button id="admrf" onclick="admLoad()">새로고침</button>
+    <button onclick="admToggle()">닫기</button></div>
+  <div id="admkeybox" style="display:none">
+    <div class="warn">관리자 키를 넣으면 <b>모든 독자</b>의 코멘트를 함께 볼 수 있습니다.
+    키는 이 기기에만 저장되고 원고나 코멘트와 함께 전송되지 않습니다.</div>
+    <div class="krow">
+      <input id="admkeyin" type="password" placeholder="관리자 키" autocomplete="off">
+      <button class="act" onclick="admSaveKey()">확인</button>
+    </div>
+  </div>
+  <div id="admbody" style="display:none">
+    <div class="afilt">
+      <select id="admWho"><option value="">독자 전체</option></select>
+      <select id="admKind"><option value="">총평 · 부분 전체</option>
+        <option value="ep">총평만</option><option value="sel">부분 코멘트만</option></select>
+      <label class="achk"><input type="checkbox" id="admHere"> 지금 보는 화만</label>
+      <input id="admQ" placeholder="코멘트 검색…">
+    </div>
+    <div class="warn" id="admmsg" style="padding-top:0"></div>
+    <div id="admlist"></div>
+    <div class="pf">
+      <button onclick="admCopy()">보이는 것 전체 복사</button>
+      <button onclick="admForget()">키 지우기</button>
+    </div>
+  </div>
+</aside>
 <button id="cmtbtn">＋ 코멘트 달기</button>
 <div id="pop">
   <div class="qz" id="pop_q"></div>
@@ -768,6 +845,7 @@ function boot(){
     window._sct=setTimeout(rememberScroll,300); }, {passive:true});
   window.addEventListener('pagehide', rememberScroll);
   document.addEventListener('visibilitychange', ()=>{ if(document.hidden) rememberScroll(); });
+  admInit();
 }
 
 /* ---------- 저장 ---------- */
@@ -847,6 +925,233 @@ window.addEventListener('pagehide',()=>{
       count:notes.length,notes:packNotes(),text:noteText()})],{type:'text/plain;charset=utf-8'})); }catch(_){}
   }
 });
+
+/* ================= 관리자 모아보기 =================
+   시트에 쌓인 전원의 코멘트를 읽어 오른쪽 패널에 띄운다.
+   ★ 읽어온 것은 ADM 안에만 두고 notes 에 절대 섞지 않는다.
+     (섞으면 자동 전송이 남의 코멘트를 내 이름으로 시트에 되돌려 복제한다) */
+const LS_A='carla_admin_v1';
+let ADMKEY='', ADM={rows:[],items:[]}, admSeq=0, admOpen=false;
+try{ ADMKEY=localStorage.getItem(LS_A)||''; }catch(_){}
+
+function admMsg(m){ const e=document.getElementById('admmsg'); if(e)e.textContent=m||''; }
+function admTitle(ci,fallback){
+  if(ci<0||!CARDS[ci]) return '(찾을 수 없는 화: '+fallback+')';
+  return CARDS[ci].title;
+}
+function admBlocks(){
+  return Array.from(document.getElementById('doc')
+    .querySelectorAll('p,td,li,h3,h4,h5,blockquote'));
+}
+function admInit(){
+  if(!(ADMKEY || location.hash==='#admin')) return;
+  const b=document.getElementById('bAdm'); if(b)b.style.display='';
+  const on=(id,ev,fn)=>{const e=document.getElementById(id); if(e)e.addEventListener(ev,fn);};
+  ['admWho','admKind','admHere'].forEach(id=>on(id,'change',admRender));
+  on('admQ','input',admRender);
+  on('admkeyin','keydown',e=>{ if(e.key==='Enter')admSaveKey(); });
+}
+function admToggle(){
+  const p=document.getElementById('adm');
+  const opening=!p.classList.contains('open');
+  if(opening && PANEL.classList.contains('open')) togglePanel();
+  p.classList.toggle('open',opening);
+  document.body.classList.toggle('admon',opening);
+  admOpen=opening;
+  if(opening){
+    if(!ADMKEY) admAskKey();
+    else { document.getElementById('admbody').style.display='';
+           if(!ADM.rows.length) admLoad(); }
+  }else shield(450);
+  admPaintBody();
+}
+function admAskKey(){
+  document.getElementById('admkeybox').style.display='';
+  document.getElementById('admbody').style.display='none';
+  setTimeout(()=>{const e=document.getElementById('admkeyin'); if(e)e.focus();},100);
+}
+function admSaveKey(){
+  const v=document.getElementById('admkeyin').value.trim();
+  if(!v)return;
+  ADMKEY=v; try{ localStorage.setItem(LS_A,v); }catch(_){}
+  document.getElementById('admkeybox').style.display='none';
+  document.getElementById('admbody').style.display='';
+  admLoad();
+}
+function admForget(){
+  ADMKEY=''; try{ localStorage.removeItem(LS_A); }catch(_){}
+  ADM={rows:[],items:[]}; admRender(); admPaintBody();
+  document.getElementById('admkeyin').value='';
+  admAskKey();
+}
+function admLoad(){
+  if(!COLLECT){ admMsg('수집 주소가 설정돼 있지 않습니다.'); return; }
+  if(!ADMKEY){ admAskKey(); return; }
+  admMsg('불러오는 중…');
+  const cb='__admcb'+(++admSeq);
+  const s=document.createElement('script');
+  let fin=false;
+  const cleanup=()=>{ try{ delete window[cb]; }catch(_){ window[cb]=undefined; }
+                      if(s.parentNode)s.parentNode.removeChild(s); };
+  window[cb]=function(d){
+    if(fin)return; fin=true; cleanup();
+    if(!d||d.ok!==true){
+      if(d&&d.err==='key'){ admMsg('관리자 키가 맞지 않습니다. 다시 넣어 주세요.');
+        ADMKEY=''; try{localStorage.removeItem(LS_A);}catch(_){} admAskKey(); }
+      else admMsg('불러오지 못했습니다'+(d&&d.err?' ('+d.err+')':'')+'.');
+      return;
+    }
+    ADM.rows=d.rows||[]; admFlatten(); admRender(); admPaintBody();
+    admMsg('✓ '+hhmm()+' 갱신 · 독자 '+ADM.rows.length+'명 · 코멘트 '+ADM.items.length+'건');
+  };
+  s.onerror=function(){ if(fin)return; fin=true; cleanup();
+    admMsg('수집 서버에 닿지 못했습니다. 앱스 스크립트가 새 버전으로 재배포됐는지 확인해 주세요.'); };
+  setTimeout(()=>{ if(fin)return; fin=true; cleanup(); admMsg('응답이 없습니다 (시간 초과).'); },20000);
+  s.src=COLLECT+(COLLECT.indexOf('?')>=0?'&':'?')+'k='+encodeURIComponent(ADMKEY)
+        +'&cb='+cb+'&t='+Date.now();
+  document.head.appendChild(s);
+}
+function admFlatten(){
+  const out=[];
+  ADM.rows.forEach(r=>{
+    const who=r.reader||'(이름 없음)';
+    (r.notes||[]).forEach((n,j)=>{
+      const ci=CARDS.findIndex(c=>c.id===n.card);
+      out.push({reader:who, ts:r.ts||'', ci:ci, card:n.card||'?',
+        view:n.view||'body', kind:(n.kind==='ep'?'ep':'sel'),
+        pidx:(n.pidx==null?-1:n.pidx), quote:n.quote||'', note:n.note||'',
+        uid:who+'#'+j});
+    });
+  });
+  out.sort((a,b)=>(a.ci<0?9999:a.ci)-(b.ci<0?9999:b.ci)
+    ||(a.kind==='ep'?0:1)-(b.kind==='ep'?0:1)
+    ||(a.reader<b.reader?-1:a.reader>b.reader?1:0)
+    ||a.pidx-b.pidx);
+  ADM.items=out;
+  const sel=document.getElementById('admWho');
+  const keep=sel.value;
+  const names=[]; ADM.rows.forEach(r=>{const w=r.reader||'(이름 없음)';
+    if(names.indexOf(w)<0)names.push(w);});
+  sel.innerHTML='';
+  const o0=document.createElement('option');
+  o0.value=''; o0.textContent='독자 전체 ('+names.length+'명)';
+  sel.appendChild(o0);
+  names.forEach(w=>{ const o=document.createElement('option');
+    o.value=w; o.textContent=w; sel.appendChild(o); });
+  if(names.indexOf(keep)>=0)sel.value=keep;
+}
+function admFiltered(){
+  const who=document.getElementById('admWho').value;
+  const kind=document.getElementById('admKind').value;
+  const here=document.getElementById('admHere').checked;
+  const q=document.getElementById('admQ').value.trim().toLowerCase();
+  return ADM.items.filter(it=>{
+    if(who&&it.reader!==who)return false;
+    if(kind&&it.kind!==kind)return false;
+    if(here&&it.ci!==cur)return false;
+    if(q&&(it.note+' '+it.quote+' '+it.reader).toLowerCase().indexOf(q)<0)return false;
+    return true;
+  });
+}
+function admRender(){
+  const L=document.getElementById('admlist'); if(!L)return;
+  const list=admFiltered();
+  const cnt=document.getElementById('admcnt');
+  if(cnt)cnt.textContent=ADM.items.length?('총 '+ADM.items.length+'건 중 '+list.length+'건'):'';
+  L.innerHTML='';
+  if(!ADM.items.length){
+    L.innerHTML='<p class="warn">아직 받은 코멘트가 없습니다. '
+      +'독자가 코멘트를 달면 몇 초 뒤 자동으로 올라오고, 「새로고침」을 누르면 다시 읽어옵니다.</p>';
+    return;
+  }
+  if(!list.length){ L.innerHTML='<p class="warn">조건에 맞는 코멘트가 없습니다.</p>'; return; }
+  let lastCi=-99;
+  const mk=(cls,txt)=>{const e=document.createElement('div');e.className=cls;
+    if(txt!=null)e.textContent=txt;return e;};
+  list.forEach(it=>{
+    if(it.ci!==lastCi){
+      lastCi=it.ci;
+      L.appendChild(mk('ahd',admTitle(it.ci,it.card)));
+    }
+    const d=mk('aitem'+(it.kind==='ep'?' ep':''),null);
+    const h=mk('ah',null);
+    const who=document.createElement('span'); who.className='who'; who.textContent=it.reader;
+    const knd=document.createElement('span');
+    knd.textContent=(it.kind==='ep'?'★ 화 전체 총평':(it.view==='rec'?'수정기록':'본문'));
+    const sp=mk('sp',null);
+    const tm=document.createElement('span'); tm.className='tm';
+    tm.textContent=it.ts?String(it.ts).slice(5,16).replace('T',' '):'';
+    h.appendChild(who); h.appendChild(knd); h.appendChild(sp); h.appendChild(tm);
+    d.appendChild(h);
+    if(it.kind!=='ep'){
+      const q=it.quote||'(인용 없음)';
+      d.appendChild(mk('aq', q.length>140?q.slice(0,140)+'…':q));
+    }
+    d.appendChild(mk('an', it.note||'(내용 없음)'));
+    d.addEventListener('click',()=>{ if(fromHere(d,'.aitem'))admJump(it); });
+    L.appendChild(d);
+  });
+}
+function admJump(it){
+  if(it.ci<0){ admMsg('이 코멘트가 가리키는 화를 찾지 못했습니다 ('+it.card+').'); return; }
+  if(it.ci!==cur) show(it.ci);
+  if(it.kind==='ep'){
+    const b=document.getElementById('epbox');
+    if(b)b.scrollIntoView({block:'start',behavior:'smooth'});
+    admMsg(''); return;
+  }
+  if(it.view!==view) setView(it.view);
+  admPaintBody();
+  const bs=admBlocks(), b=bs[it.pidx];
+  if(b){
+    b.scrollIntoView({block:'center',behavior:'smooth'});
+    b.classList.add('admflash');
+    setTimeout(()=>b.classList.remove('admflash'),2200);
+    admMsg('');
+  }else{
+    admMsg('원고가 그 뒤로 바뀌어 정확한 위치를 찾지 못했습니다. 위 인용문으로 확인해 주세요.');
+  }
+}
+function admPaintBody(){
+  const doc=document.getElementById('doc'); if(!doc)return;
+  doc.querySelectorAll('.admblk').forEach(e=>{
+    e.classList.remove('admblk'); e.removeAttribute('data-adm'); });
+  if(!admOpen||!ADM.items.length)return;
+  const bs=admBlocks(), tally={};
+  ADM.items.forEach(it=>{
+    if(it.ci!==cur||it.kind==='ep'||it.view!==view)return;
+    if(it.pidx<0||!bs[it.pidx])return;
+    (tally[it.pidx]=tally[it.pidx]||[]).push(it.reader);
+  });
+  Object.keys(tally).forEach(k=>{
+    const uniq=tally[k].filter((v,i,a)=>a.indexOf(v)===i);
+    bs[k].classList.add('admblk');
+    bs[k].setAttribute('data-adm',uniq.join(' · '));
+  });
+}
+function admCopy(){
+  const list=admFiltered();
+  if(!list.length){ admMsg('복사할 것이 없습니다.'); return; }
+  let out='# 독자 코멘트 모아보기\n\n', lastCi=-99;
+  list.forEach(it=>{
+    if(it.ci!==lastCi){ lastCi=it.ci;
+      out+='\n## '+admTitle(it.ci,it.card)+'\n\n'; }
+    out+='- **'+it.reader+'** · '+(it.kind==='ep'?'★ 화 전체 총평':'부분')+'\n';
+    if(it.kind!=='ep'&&it.quote) out+='  > '+it.quote.replace(/\n/g,' ')+'\n';
+    out+='  '+it.note.replace(/\n/g,'\n  ')+'\n\n';
+  });
+  const done=()=>admMsg('✓ 복사했습니다 ('+list.length+'건).');
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(out).then(done,()=>admMsg('복사하지 못했습니다.'));
+  }else{
+    const t=document.createElement('textarea'); t.value=out; document.body.appendChild(t);
+    t.select(); try{document.execCommand('copy');done();}catch(_){admMsg('복사하지 못했습니다.');}
+    t.remove();
+  }
+}
+/* 화 전환·뷰 전환 뒤에도 본문 표시를 다시 칠한다 */
+const _renderBase = render;
+render = function(){ _renderBase.apply(this,arguments); admPaintBody(); };
 
 /* ---------- 게이트 기동 ---------- */
 (function(){
