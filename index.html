@@ -930,9 +930,16 @@ window.addEventListener('pagehide',()=>{
    시트에 쌓인 전원의 코멘트를 읽어 오른쪽 패널에 띄운다.
    ★ 읽어온 것은 ADM 안에만 두고 notes 에 절대 섞지 않는다.
      (섞으면 자동 전송이 남의 코멘트를 내 이름으로 시트에 되돌려 복제한다) */
-const LS_A='carla_admin_v1';
+const LS_A='carla_admin_v1', LS_AF='carla_admin_on';
 let ADMKEY='', ADM={rows:[],items:[]}, admSeq=0, admOpen=false;
 try{ ADMKEY=localStorage.getItem(LS_A)||''; }catch(_){}
+/* 관리자 진입: #admin / ?admin 어느 쪽이든 받고, 한 번 들어오면 그 기기에 기억한다.
+   (해시가 지워지거나 즐겨찾기로 다시 들어와도 단추가 사라지지 않도록) */
+function admEntry(){
+  const s=((location.hash||'')+(location.search||'')).toLowerCase();
+  if(s.indexOf('admin')>=0){ try{localStorage.setItem(LS_AF,'1');}catch(_){} return true; }
+  try{ return localStorage.getItem(LS_AF)==='1'; }catch(_){ return false; }
+}
 
 function admMsg(m){ const e=document.getElementById('admmsg'); if(e)e.textContent=m||''; }
 function admTitle(ci,fallback){
@@ -944,7 +951,7 @@ function admBlocks(){
     .querySelectorAll('p,td,li,h3,h4,h5,blockquote'));
 }
 function admInit(){
-  if(!(ADMKEY || location.hash==='#admin')) return;
+  if(!(ADMKEY || admEntry())) return;
   const b=document.getElementById('bAdm'); if(b)b.style.display='';
   const on=(id,ev,fn)=>{const e=document.getElementById(id); if(e)e.addEventListener(ev,fn);};
   ['admWho','admKind','admHere'].forEach(id=>on(id,'change',admRender));
@@ -979,7 +986,7 @@ function admSaveKey(){
   admLoad();
 }
 function admForget(){
-  ADMKEY=''; try{ localStorage.removeItem(LS_A); }catch(_){}
+  ADMKEY=''; try{ localStorage.removeItem(LS_A); localStorage.removeItem(LS_AF); }catch(_){}
   ADM={rows:[],items:[]}; admRender(); admPaintBody();
   document.getElementById('admkeyin').value='';
   admAskKey();
