@@ -6,7 +6,7 @@
 <title>카를라 0~31화 검수 카드</title>
 <style>
 :root{--bg:#12100e;--panel:#1b1815;--line:#332e28;--fg:#e8e1d6;--dim:#9a9086;
---gold:#c9a227;--del:#c85a4a;--ins:#6fae7a;}
+--gold:#c9a227;--del:#c85a4a;--ins:#6fae7a;--oth:#5b8dd6;}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
 body{background:var(--bg);color:var(--fg);
@@ -27,7 +27,13 @@ border-left:2px solid transparent}
 .it.hid{display:none}
 .it .no{color:var(--dim);font-size:11px;min-width:30px}
 .it .tt{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.it .dot{font-size:10px;color:var(--dim)}
+.it .dot{font-size:10px;color:var(--dim);display:flex;gap:4px;align-items:center;flex:none}
+.it .dot b{font-weight:600;font-size:10px}
+.it .dc{color:var(--gold)}
+.it .do{color:var(--oth)}
+.it .dd{color:var(--del)}
+.it .di{color:var(--ins)}
+body.clean .it .dd,body.clean .it .di{display:none}
 .it.done .tt{color:var(--ins)}
 #main{flex:1;height:100vh;overflow-y:auto}
 #bar{position:sticky;top:0;background:rgba(18,16,14,.96);border-bottom:1px solid var(--line);
@@ -341,8 +347,11 @@ function buildNav(){
     const h=document.createElement('div');h.className='actname';h.textContent=a;nav.appendChild(h);
     list.forEach(([c,i])=>{
       const d=document.createElement('div');d.className='it';d.dataset.i=i;
+      /* 카운터 네 칸 — 내 코멘트(금) · 다른 독자 코멘트(파랑, 관리자만) ·
+         취소선(빨강) · 추가(초록). 값이 0 인 칸은 paint() 에서 숨긴다. */
       d.innerHTML='<span class="no">'+c.id+'화</span><span class="tt"></span>'
-        +'<span class="dot">'+(c.ndel||'')+'</span>';
+        +'<span class="dot"><b class="dc"></b><b class="do"></b>'
+        +'<b class="dd"></b><b class="di"></b></span>';
       d.querySelector('.tt').textContent=c.title.replace(/^[^—]*—\s*/,'');
       d.addEventListener('click',()=>{
         if(!fromHere(d,'.it'))return;
@@ -359,8 +368,21 @@ function paint(){
     d.classList.toggle('on',i===cur);
     d.classList.toggle('done',done.has(CARDS[i].id));
     const k=notes.filter(n=>n.ci===i).length;
-    d.querySelector('.dot').textContent=k?'✎'+k:(CARDS[i].ndel||'');
-    d.querySelector('.dot').style.color=k?'var(--gold)':'';
+    /* 다른 독자 코멘트 수는 관리자 블록(사이트 빌드에서만 붙는다)이 있을 때만 센다. */
+    const o=(typeof admOtherCount==='function')?admOtherCount(i):0;
+    const c=CARDS[i];
+    const put=(sel,txt)=>{const e=d.querySelector(sel); if(!e)return;
+      e.textContent=txt; e.style.display=txt?'':'none';};
+    put('.dc',k?'✎'+k:'');
+    put('.do',o?'✎'+o:'');
+    put('.dd',c.ndel?'−'+c.ndel:'');
+    put('.di',c.nins?'+'+c.nins:'');
+    const tip=[];
+    if(k)tip.push('내 코멘트 '+k+'건');
+    if(o)tip.push('다른 독자 코멘트 '+o+'건');
+    if(c.ndel)tip.push('버림 '+c.ndel+'곳');
+    if(c.nins)tip.push('넣음 '+c.nins+'곳');
+    d.querySelector('.dot').title=tip.join(' · ');
   });
   document.getElementById('cnt').textContent='검토 완료 '+done.size+' / '+CARDS.length;
   document.getElementById('bDone').classList.toggle('act',done.has(CARDS[cur].id));
@@ -987,9 +1009,21 @@ function admSaveKey(){
 }
 function admForget(){
   ADMKEY=''; try{ localStorage.removeItem(LS_A); localStorage.removeItem(LS_AF); }catch(_){}
-  ADM={rows:[],items:[]}; admRender(); admPaintBody();
+  ADM={rows:[],items:[]}; admRender(); admPaintBody(); _paint();
   document.getElementById('admkeyin').value='';
   admAskKey();
+}
+/* 목차 파란 숫자용 — 화별로 '나 아닌 독자'의 코멘트만 센다.
+   관리자 키가 없거나 아직 안 읽어 왔으면 0 이라 칸 자체가 그려지지 않는다. */
+function admOtherCount(ci){
+  if(!ADMKEY||!ADM.items||!ADM.items.length)return 0;
+  const me=READER||'(이름 없음)';
+  let n=0;
+  for(let j=0;j<ADM.items.length;j++){
+    const it=ADM.items[j];
+    if(it.ci===ci&&it.reader!==me)n++;
+  }
+  return n;
 }
 function admLoad(){
   if(!COLLECT){ admMsg('수집 주소가 설정돼 있지 않습니다.'); return; }
@@ -1009,6 +1043,9 @@ function admLoad(){
       return;
     }
     ADM.rows=d.rows||[]; admFlatten(); admRender(); admPaintBody();
+    /* 목차의 파란 숫자를 다시 칠한다. 감싼 paint() 를 쓰면 남의 코멘트를 읽은 것이
+       내 코멘트 전송을 깨우므로, 원본 _paint() 를 부른다. */
+    _paint();
     admMsg('✓ '+hhmm()+' 갱신 · 독자 '+ADM.rows.length+'명 · 코멘트 '+ADM.items.length+'건');
   };
   s.onerror=function(){ if(fin)return; fin=true; cleanup();
