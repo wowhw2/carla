@@ -950,13 +950,66 @@ function admBlocks(){
   return Array.from(document.getElementById('doc')
     .querySelectorAll('p,td,li,h3,h4,h5,blockquote'));
 }
-function admInit(){
-  if(!(ADMKEY || admEntry())) return;
-  const b=document.getElementById('bAdm'); if(b)b.style.display='';
+/* ★[2026-08-06] 모바일 진입로.
+   휴대폰에서는 주소창에 #admin 을 치기가 번거롭고, 공유 링크로 열면 해시가
+   떨어져 나가기도 한다. 그래서 사이드바 제목을 짧은 시간 안에 다섯 번 두드리면
+   관리자 모드가 켜지게 해 둔다. 켜지면 그 기기에 기억된다(해시와 같은 취급). */
+function admTapEntry(){
+  const h=document.querySelector('#side h1');
+  if(!h) return;
+  h.style.cursor='default';
+  h.style.webkitTapHighlightColor='transparent';
+  let n=0, t=0;
+  const hit=()=>{
+    const now=Date.now();
+    if(now-t>1600) n=0;      // 뜸하면 처음부터
+    t=now; n++;
+    if(n>=3 && n<5) admToast('관리자 모드까지 '+(5-n)+'번');
+    if(n>=5){
+      n=0;
+      try{ localStorage.setItem(LS_AF,'1'); }catch(_){}
+      const b=document.getElementById('bAdm');
+      if(b && b.style.display===''){ admToast('이미 켜져 있습니다'); return; }
+      if(b) b.style.display='';
+      admBind();
+      admToast('관리자 모드가 켜졌습니다 — 위쪽 「모아보기」');
+    }
+  };
+  h.addEventListener('click', hit);
+}
+
+let _admToastT=0;
+function admToast(msg){
+  let e=document.getElementById('admtoast');
+  if(!e){
+    e=document.createElement('div');
+    e.id='admtoast';
+    e.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);'
+      +'background:#241f1b;color:#e8dcc4;border:1px solid #4a3f33;border-radius:20px;'
+      +'padding:9px 16px;font-size:13px;z-index:60;box-shadow:0 4px 18px rgba(0,0,0,.6);'
+      +'pointer-events:none;max-width:calc(100vw - 32px);text-align:center';
+    document.body.appendChild(e);
+  }
+  e.textContent=msg;
+  e.style.opacity='1';
+  clearTimeout(_admToastT);
+  _admToastT=setTimeout(()=>{ e.style.opacity='0'; e.style.transition='opacity .4s'; },1800);
+}
+
+/* 관리자 패널의 입력 연결 — 뒤늦게 켜도 동작하도록 따로 뺀다 */
+function admBind(){
+  if(admBind._done) return; admBind._done=true;
   const on=(id,ev,fn)=>{const e=document.getElementById(id); if(e)e.addEventListener(ev,fn);};
   ['admWho','admKind','admHere'].forEach(id=>on(id,'change',admRender));
   on('admQ','input',admRender);
   on('admkeyin','keydown',e=>{ if(e.key==='Enter')admSaveKey(); });
+}
+
+function admInit(){
+  admTapEntry();                       // ★어느 기기에서든 진입로를 열어 둔다
+  if(!(ADMKEY || admEntry())) return;
+  const b=document.getElementById('bAdm'); if(b)b.style.display='';
+  admBind();
 }
 function admToggle(){
   const p=document.getElementById('adm');
