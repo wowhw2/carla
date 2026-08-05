@@ -44,7 +44,6 @@ line-height:1;white-space:nowrap}
   .it{padding:10px 14px;font-size:14px;gap:6px}
   .it .no{min-width:34px;font-size:12px}
   .it .bdg{font-size:11.5px;gap:6px}
-  #side{width:290px;left:-290px}
   #nav{-webkit-overflow-scrolling:touch}
 }
 #main{flex:1;height:100vh;overflow-y:auto}
@@ -142,8 +141,13 @@ padding:0 0 0 10px;cursor:pointer}
 #eplist .none{font-size:12px;color:var(--dim);line-height:1.75}
 #foot{display:flex;gap:10px;justify-content:space-between;margin-top:46px;
 border-top:1px solid var(--line);padding-top:16px}
-@media(max-width:760px){#side{position:fixed;left:-270px;transition:left .2s;z-index:20}
-#side.open{left:0}#burger{display:inline-block!important}#wrap{padding:20px 16px 100px}}
+/* 모바일 서랍 — 폭을 px로 되빼지 않고 제 너비만큼(-100%) 밀어 둔다.
+   px로 빼면 나중에 폭을 바꿀 때 어긋나 가장자리가 삐져나온다. */
+@media(max-width:760px){
+#side{position:fixed;top:0;left:0;width:min(290px,84vw);flex-basis:auto;
+transform:translateX(-100%);transition:transform .2s ease;z-index:30;will-change:transform}
+#side.open{transform:translateX(0);box-shadow:0 0 0 100vmax rgba(0,0,0,.5)}
+#burger{display:inline-block!important}#wrap{padding:20px 16px 100px}}
 #burger{display:none}
 
 :root{--ext:#7fa6d6}
@@ -373,6 +377,12 @@ function buildNav(){
   });
   paint();
 }
+/* 서랍이 열린 채로 본문을 건드리면 먼저 닫는다 — 뒤에 가려진 것을 잘못 누르지 않게. */
+document.getElementById('main').addEventListener('click',function(e){
+  if(!side.classList.contains('open'))return;
+  side.classList.remove('open');
+  e.preventDefault(); e.stopPropagation();
+},true);
 function paint(){
   document.querySelectorAll('.it').forEach(d=>{
     const i=+d.dataset.i;
@@ -1039,6 +1049,9 @@ function admInit(){
   if(!(ADMKEY || admEntry())) return;
   const b=document.getElementById('bAdm'); if(b)b.style.display='';
   admBind();
+  /* ★[2026-08-06] 키가 이미 있으면 패널을 열지 않아도 한 번 받아 온다.
+     이 기기에 없는 내 코멘트를 되받기 위해서다. 본문 표시는 패널을 열어야 켜진다. */
+  if(ADMKEY && COLLECT) setTimeout(()=>{ if(!ADM.rows.length) admLoad(); }, 600);
 }
 function admToggle(){
   const p=document.getElementById('adm');
@@ -1090,8 +1103,11 @@ function admLoad(){
       else admMsg('불러오지 못했습니다'+(d&&d.err?' ('+d.err+')':'')+'.');
       return;
     }
-    ADM.rows=d.rows||[]; admFlatten(); admRender(); admPaintBody();
-    admMsg('✓ '+hhmm()+' 갱신 · 독자 '+ADM.rows.length+'명 · 코멘트 '+ADM.items.length+'건');
+    ADM.rows=d.rows||[];
+    const back=syncMine();
+    admFlatten(); admRender(); admPaintBody();
+    admMsg('✓ '+hhmm()+' 갱신 · 독자 '+ADM.rows.length+'명 · 코멘트 '+ADM.items.length+'건'
+           +(back?' · 내 코멘트 '+back+'건 되받음':''));
   };
   s.onerror=function(){ if(fin)return; fin=true; cleanup();
     admMsg('수집 서버에 닿지 못했습니다. 앱스 스크립트가 새 버전으로 재배포됐는지 확인해 주세요.'); };
@@ -1099,6 +1115,35 @@ function admLoad(){
   s.src=COLLECT+(COLLECT.indexOf('?')>=0?'&':'?')+'k='+encodeURIComponent(ADMKEY)
         +'&cb='+cb+'&t='+Date.now();
   document.head.appendChild(s);
+}
+/* ★[2026-08-06] 내 코멘트 되받기 — 코멘트는 기기 안에 쌓이므로 폰에서 열면 비어 있다.
+   서버에 올라간 것 중 같은 이름으로 제출된 최신 묶음을 가져와 로컬에 합친다.
+   덮어쓰지 않고 없는 것만 더한다 — 방금 이 기기에서 쓴 것을 잃지 않게. */
+function mineKey(card,view,kind,pidx,note){
+  return JSON.stringify([card,view||'body',kind||'sel',(pidx==null?-1:pidx),note||'']);
+}
+function syncMine(){
+  if(!READER) return 0;
+  let best=null;
+  ADM.rows.forEach(r=>{
+    if((r.reader||'')!==READER) return;
+    if(!best || String(r.ts||'') > String(best.ts||'')) best=r;
+  });
+  if(!best || !best.notes || !best.notes.length) return 0;
+  const have={};
+  notes.forEach(n=>{ have[mineKey(CARDS[n.ci]?CARDS[n.ci].id:'?',n.view,n.kind,n.pidx,n.note)]=1; });
+  let add=0;
+  best.notes.forEach(x=>{
+    const ci=CARDS.findIndex(c=>c.id===x.card); if(ci<0) return;
+    const k=mineKey(x.card,x.view,x.kind,x.pidx,x.note);
+    if(have[k]) return;
+    have[k]=1;
+    notes.push({id:nid++,ci:ci,view:x.view||'body',kind:x.kind||'sel',
+                pidx:x.pidx,quote:x.quote||'',note:x.note||''});
+    add++;
+  });
+  if(add){ persist(); try{ render(); renderPanel(); paint(); }catch(_){} }
+  return add;
 }
 function admFlatten(){
   const out=[];
