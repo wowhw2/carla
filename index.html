@@ -29,6 +29,24 @@ border-left:2px solid transparent}
 .it .tt{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .it .dot{font-size:10px;color:var(--dim)}
 .it.done .tt{color:var(--ins)}
+/* ★[2026-08-06] 화별 배지 4종 — 취소선 / 볼드 / 내 코멘트 / 남의 코멘트.
+   전에는 .dot 하나에 셋이 번갈아 들어가 서로를 가렸다(모바일에서 특히). */
+.it .bdg{display:flex;gap:5px;align-items:baseline;flex:0 0 auto;font-size:10px;
+line-height:1;white-space:nowrap}
+.it .bdg i{font-style:normal}
+.it .bdel{color:var(--del)}
+.it .bins{color:var(--ins)}
+.it .bmine{color:var(--gold);font-weight:700}
+.it .bothers{color:#6fa8dc;font-weight:700}
+.it .bdg i:empty{display:none}
+@media(max-width:760px){
+  /* 손가락으로 누르기 쉽게 줄 높이를 키우고, 배지는 조금 크게 */
+  .it{padding:10px 14px;font-size:14px;gap:6px}
+  .it .no{min-width:34px;font-size:12px}
+  .it .bdg{font-size:11.5px;gap:6px}
+  #side{width:290px;left:-290px}
+  #nav{-webkit-overflow-scrolling:touch}
+}
 #main{flex:1;height:100vh;overflow-y:auto}
 #bar{position:sticky;top:0;background:rgba(18,16,14,.96);border-bottom:1px solid var(--line);
 padding:9px 26px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;z-index:5;
@@ -342,7 +360,9 @@ function buildNav(){
     list.forEach(([c,i])=>{
       const d=document.createElement('div');d.className='it';d.dataset.i=i;
       d.innerHTML='<span class="no">'+c.id+'화</span><span class="tt"></span>'
-        +'<span class="dot">'+(c.ndel||'')+'</span>';
+        +'<span class="bdg">'
+        +'<i class="bdel"></i><i class="bins"></i>'
+        +'<i class="bmine"></i><i class="bothers"></i></span>';
       d.querySelector('.tt').textContent=c.title.replace(/^[^—]*—\s*/,'');
       d.addEventListener('click',()=>{
         if(!fromHere(d,'.it'))return;
@@ -358,9 +378,18 @@ function paint(){
     const i=+d.dataset.i;
     d.classList.toggle('on',i===cur);
     d.classList.toggle('done',done.has(CARDS[i].id));
-    const k=notes.filter(n=>n.ci===i).length;
-    d.querySelector('.dot').textContent=k?'✎'+k:(CARDS[i].ndel||'');
-    d.querySelector('.dot').style.color=k?'var(--gold)':'';
+    const c=CARDS[i];
+    const mine=notes.filter(n=>n.ci===i).length;
+    /* 남의 코멘트 수 — 관리자 모드에서 window.OTHERS 가 채워지면 그때만 뜬다 */
+    const oth=(window.OTHERS && window.OTHERS[i]) || 0;
+    const set=(sel,txt,title)=>{
+      const e=d.querySelector(sel); if(!e)return;
+      e.textContent=txt||''; e.title=title||'';
+    };
+    set('.bdel', c.ndel?('−'+c.ndel):'', '취소선 '+(c.ndel||0)+'곳');
+    set('.bins', c.nins?('＋'+c.nins):'', '볼드 '+(c.nins||0)+'곳');
+    set('.bmine', mine?('✎'+mine):'', '내 코멘트 '+mine+'건');
+    set('.bothers', oth?('✎'+oth):'', '다른 독자 코멘트 '+oth+'건');
   });
   document.getElementById('cnt').textContent='검토 완료 '+done.size+' / '+CARDS.length;
   document.getElementById('bDone').classList.toggle('act',done.has(CARDS[cur].id));
@@ -1040,7 +1069,7 @@ function admSaveKey(){
 }
 function admForget(){
   ADMKEY=''; try{ localStorage.removeItem(LS_A); localStorage.removeItem(LS_AF); }catch(_){}
-  ADM={rows:[],items:[]}; admRender(); admPaintBody();
+  ADM={rows:[],items:[]}; window.OTHERS=null; admRender(); admPaintBody(); try{ paint(); }catch(_){}
   document.getElementById('admkeyin').value='';
   admAskKey();
 }
@@ -1088,6 +1117,16 @@ function admFlatten(){
     ||(a.reader<b.reader?-1:a.reader>b.reader?1:0)
     ||a.pidx-b.pidx);
   ADM.items=out;
+  /* ★[2026-08-06] 화별 남의 코멘트 수를 목차 배지로 넘긴다.
+     내가 쓴 것은 빼고 센다(내 배지는 따로 있다). */
+  const cnt={};
+  out.forEach(it=>{
+    if(it.ci==null||it.ci<0)return;
+    if(READER && it.reader===READER)return;      // 내 것은 제외
+    cnt[it.ci]=(cnt[it.ci]||0)+1;
+  });
+  window.OTHERS=cnt;
+  try{ paint(); }catch(_){}
   const sel=document.getElementById('admWho');
   const keep=sel.value;
   const names=[]; ADM.rows.forEach(r=>{const w=r.reader||'(이름 없음)';
