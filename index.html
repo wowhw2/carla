@@ -3,10 +3,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
 <meta name="referrer" content="no-referrer">
-<title>카를라 0~31화 검수 카드</title>
+<title>카를라 0~40화 검수 카드</title>
 <style>
 :root{--bg:#12100e;--panel:#1b1815;--line:#332e28;--fg:#e8e1d6;--dim:#9a9086;
---gold:#c9a227;--del:#c85a4a;--ins:#6fae7a;--oth:#5b8dd6;}
+--gold:#c9a227;--del:#c85a4a;--ins:#6fae7a;}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
 body{background:var(--bg);color:var(--fg);
@@ -27,13 +27,7 @@ border-left:2px solid transparent}
 .it.hid{display:none}
 .it .no{color:var(--dim);font-size:11px;min-width:30px}
 .it .tt{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.it .dot{font-size:10px;color:var(--dim);display:flex;gap:4px;align-items:center;flex:none}
-.it .dot b{font-weight:600;font-size:10px}
-.it .dc{color:var(--gold)}
-.it .do{color:var(--oth);display:flex;gap:3px;align-items:center}
-.it .dd{color:var(--del)}
-.it .di{color:var(--ins)}
-body.clean .it .dd,body.clean .it .di{display:none}
+.it .dot{font-size:10px;color:var(--dim)}
 .it.done .tt{color:var(--ins)}
 #main{flex:1;height:100vh;overflow-y:auto}
 #bar{position:sticky;top:0;background:rgba(18,16,14,.96);border-bottom:1px solid var(--line);
@@ -168,29 +162,18 @@ border-radius:6px;padding:9px 10px;margin-bottom:9px;cursor:pointer}
 .aitem .ah{font-size:10.5px;color:var(--ext);margin-bottom:5px;display:flex;gap:6px;
 align-items:center;flex-wrap:wrap}
 .aitem.ep .ah{color:var(--gold)}
-/* --who 는 독자마다 다른 색. admRender / admPaintBody 에서 인라인으로 꽂는다. */
-.aitem{border-left-color:var(--who,var(--ext))}
-.aitem .ah .who{background:#2b3540;color:var(--who,#cfe0f2);border-radius:3px;
-padding:1px 6px;font-weight:600;box-shadow:inset 0 0 0 1px var(--who,transparent)}
-.aitem.ep{border-left-color:var(--gold)}
-.aitem.ep .ah .who{background:#3a3116}
+.aitem .ah .who{background:#2b3540;color:#cfe0f2;border-radius:3px;padding:1px 6px;font-weight:600}
+.aitem.ep .ah .who{background:#3a3116;color:#f0dcae}
 .aitem .ah .sp{flex:1}
 .aitem .ah .tm{color:#6d645b}
 .aitem .aq{font-size:11.5px;color:var(--dim);line-height:1.6;margin-bottom:5px;
 border-left:2px solid var(--line);padding-left:7px}
 .aitem .an{font-size:13px;line-height:1.7;white-space:pre-wrap}
 #adm .pf{border-top:1px solid var(--line);padding:9px 12px;display:flex;gap:7px;flex-wrap:wrap}
-.admblk{outline:1px dashed var(--who,var(--ext));outline-offset:3px;border-radius:3px;
-position:relative}
-.admblk::after{content:attr(data-adm);position:absolute;right:-2px;top:-16px;
-font-size:9.5px;color:var(--who,var(--ext));letter-spacing:.02em}
+.admblk{outline:1px dashed var(--ext);outline-offset:3px;border-radius:3px;position:relative}
+.admblk::after{content:"독자 " attr(data-adm);position:absolute;right:-2px;top:-16px;
+font-size:9.5px;color:var(--ext);letter-spacing:.02em}
 .admflash{background:#24384d;transition:background 1.2s}
-/* 목차 위 독자 범례 — 관리자일 때만 생긴다 */
-#admleg{padding:0 14px 8px;display:flex;flex-wrap:wrap;gap:4px 9px;font-size:10.5px;
-color:var(--dim);line-height:1.5}
-#admleg i{font-style:normal;display:inline-flex;align-items:center;gap:4px}
-#admleg i::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;
-display:inline-block}
 
 #gate{position:fixed;inset:0;z-index:90;background:#0d0b09;display:flex;
 align-items:center;justify-content:center;padding:20px}
@@ -214,7 +197,7 @@ body.locked{overflow:hidden}
 
 <div id="gate">
   <div class="gbox">
-    <h2>카를라 — 0~31화 검토본</h2>
+    <h2>카를라 — 0~40화 검토본</h2>
     <p class="gsub">테스트 독자 전용입니다. 받으신 암호를 넣어 주세요.</p>
     <label>이름 <span>(코멘트에 함께 남습니다)</span></label>
     <input id="gname" placeholder="예: 진우" autocomplete="nickname">
@@ -229,7 +212,7 @@ body.locked{overflow:hidden}
 </div>
 
 <aside id="side">
-  <h1>카를라 검수 카드<small>0~31화 · 테스트 독자용</small></h1>
+  <h1>카를라 검수 카드<small>0~40화 · 테스트 독자용</small></h1>
   <input id="q" placeholder="본문 검색…">
   <div id="nav"></div>
 </aside>
@@ -244,7 +227,6 @@ body.locked{overflow:hidden}
     <button id="bAdd" title="선택한 문장에 코멘트">＋ 선택 부분</button>
     <button id="bCmt" onclick="togglePanel()">코멘트 0</button>
     <button id="bAdm" onclick="admToggle()" style="display:none">모아보기</button>
-    <button id="bAdmB" onclick="admBodyToggle()" style="display:none">독자 표시 끄기</button>
     <button id="bDone" onclick="toggleDone()">검토 완료 표시</button>
   </div>
   <div id="wrap">
@@ -359,11 +341,8 @@ function buildNav(){
     const h=document.createElement('div');h.className='actname';h.textContent=a;nav.appendChild(h);
     list.forEach(([c,i])=>{
       const d=document.createElement('div');d.className='it';d.dataset.i=i;
-      /* 카운터 네 칸 — 내 코멘트(금) · 다른 독자 코멘트(파랑, 관리자만) ·
-         취소선(빨강) · 추가(초록). 값이 0 인 칸은 paint() 에서 숨긴다. */
       d.innerHTML='<span class="no">'+c.id+'화</span><span class="tt"></span>'
-        +'<span class="dot"><b class="dc"></b><span class="do"></span>'
-        +'<b class="dd"></b><b class="di"></b></span>';
+        +'<span class="dot">'+(c.ndel||'')+'</span>';
       d.querySelector('.tt').textContent=c.title.replace(/^[^—]*—\s*/,'');
       d.addEventListener('click',()=>{
         if(!fromHere(d,'.it'))return;
@@ -380,36 +359,8 @@ function paint(){
     d.classList.toggle('on',i===cur);
     d.classList.toggle('done',done.has(CARDS[i].id));
     const k=notes.filter(n=>n.ci===i).length;
-    /* 다른 독자 코멘트 수는 관리자 블록(사이트 빌드에서만 붙는다)이 있을 때만 센다. */
-    const ob=(typeof admOtherBreak==='function')?admOtherBreak(i):[];
-    const o=ob.reduce((s,x)=>s+x.n,0);
-    const c=CARDS[i];
-    const put=(sel,txt)=>{const e=d.querySelector(sel); if(!e)return;
-      e.textContent=txt; e.style.display=txt?'':'none';};
-    put('.dc',k?'✎'+k:'');
-    put('.dd',c.ndel?'−'+c.ndel:'');
-    put('.di',c.nins?'+'+c.nins:'');
-    /* 다른 독자 칸 — 4명 이하면 사람마다 제 색으로 따로 세우고,
-       5명 넘어가면 줄이 무너지므로 파란 합계 하나로 접는다. */
-    const bx=d.querySelector('.do');
-    if(bx){
-      bx.innerHTML='';
-      if(ob.length&&ob.length<=4){
-        ob.forEach(x=>{const e=document.createElement('b');
-          e.textContent='✎'+x.n; e.style.color=x.col; e.title=x.who+' '+x.n+'건';
-          bx.appendChild(e);});
-      }else if(o){
-        const e=document.createElement('b');
-        e.textContent='✎'+o; e.style.color='var(--oth)'; bx.appendChild(e);
-      }
-      bx.style.display=o?'':'none';
-    }
-    const tip=[];
-    if(k)tip.push('내 코멘트 '+k+'건');
-    ob.forEach(x=>tip.push(x.who+' '+x.n+'건'));
-    if(c.ndel)tip.push('버림 '+c.ndel+'곳');
-    if(c.nins)tip.push('넣음 '+c.nins+'곳');
-    d.querySelector('.dot').title=tip.join(' · ');
+    d.querySelector('.dot').textContent=k?'✎'+k:(CARDS[i].ndel||'');
+    d.querySelector('.dot').style.color=k?'var(--gold)':'';
   });
   document.getElementById('cnt').textContent='검토 완료 '+done.size+' / '+CARDS.length;
   document.getElementById('bDone').classList.toggle('act',done.has(CARDS[cur].id));
@@ -729,7 +680,7 @@ function delOverall(){
   delNote(o.id); epmsg2('총평을 지웠습니다.');
 }
 function noteText(){
-  let out='# 검토 코멘트 — 카를라 0~31화 검수본\n\n';
+  let out='# 검토 코멘트 — 카를라 0~40화 검수본\n\n';
   const by={};
   notes.forEach(n=>{(by[n.ci]=by[n.ci]||[]).push(n);});
   Object.keys(by).map(Number).sort((a,b)=>a-b).forEach(k=>{
@@ -780,7 +731,7 @@ function exportNotes(){
   if(!notes.length)return;
   const b=new Blob([noteText()],{type:'text/markdown;charset=utf-8'});
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(b); a.download='검토코멘트_0-31화.md';
+  a.href=URL.createObjectURL(b); a.download='검토코멘트_0-40화.md';
   document.body.appendChild(a); a.click(); a.remove(); dirty=false; paint();
   setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 }
@@ -979,20 +930,9 @@ window.addEventListener('pagehide',()=>{
    시트에 쌓인 전원의 코멘트를 읽어 오른쪽 패널에 띄운다.
    ★ 읽어온 것은 ADM 안에만 두고 notes 에 절대 섞지 않는다.
      (섞으면 자동 전송이 남의 코멘트를 내 이름으로 시트에 되돌려 복제한다) */
-const LS_A='carla_admin_v1', LS_AF='carla_admin_on', LS_AB='carla_admin_body';
-let ADMKEY='', ADM={rows:[],items:[]}, admSeq=0, admOpen=false, admBodyOn=true;
+const LS_A='carla_admin_v1', LS_AF='carla_admin_on';
+let ADMKEY='', ADM={rows:[],items:[]}, admSeq=0, admOpen=false;
 try{ ADMKEY=localStorage.getItem(LS_A)||''; }catch(_){}
-try{ admBodyOn=localStorage.getItem(LS_AB)!=='0'; }catch(_){}
-
-/* ---- 독자별 색 ----
-   금(--gold)·빨강(--del)·초록(--ins) 과 부딪히지 않는 여섯 색.
-   이름순으로 고정 배정하므로 새로고침해도 같은 사람은 같은 색이다. */
-const ADMPAL=['#5b8dd6','#cc79a7','#9d8ad9','#45b8ac','#e08a3c','#8fa8bd'];
-let ADMWHO=[];
-function admColor(w){
-  const i=ADMWHO.indexOf(w);
-  return i<0 ? 'var(--ext)' : ADMPAL[i%ADMPAL.length];
-}
 /* 관리자 진입: #admin / ?admin 어느 쪽이든 받고, 한 번 들어오면 그 기기에 기억한다.
    (해시가 지워지거나 즐겨찾기로 다시 들어와도 단추가 사라지지 않도록) */
 function admEntry(){
@@ -1017,21 +957,6 @@ function admInit(){
   ['admWho','admKind','admHere'].forEach(id=>on(id,'change',admRender));
   on('admQ','input',admRender);
   on('admkeyin','keydown',e=>{ if(e.key==='Enter')admSaveKey(); });
-  admBodyBtn();
-  /* ★ 패널을 열지 않아도 처음부터 남의 코멘트가 보이도록 미리 읽어 둔다.
-     실패해도 조용히 넘어가고, 나중에 「모아보기」를 열면 다시 시도한다. */
-  if(ADMKEY) setTimeout(admLoad, 400);
-}
-function admBodyBtn(){
-  const b=document.getElementById('bAdmB'); if(!b)return;
-  b.style.display='';
-  b.textContent = admBodyOn ? '독자 표시 끄기' : '독자 표시 켜기';
-  b.classList.toggle('act', admBodyOn);
-}
-function admBodyToggle(){
-  admBodyOn=!admBodyOn;
-  try{ localStorage.setItem(LS_AB, admBodyOn?'1':'0'); }catch(_){}
-  admBodyBtn(); admPaintBody();
 }
 function admToggle(){
   const p=document.getElementById('adm');
@@ -1062,22 +987,9 @@ function admSaveKey(){
 }
 function admForget(){
   ADMKEY=''; try{ localStorage.removeItem(LS_A); localStorage.removeItem(LS_AF); }catch(_){}
-  ADM={rows:[],items:[]}; ADMWHO=[]; admLegend(); admRender(); admPaintBody(); _paint();
-  const bb=document.getElementById('bAdmB'); if(bb)bb.style.display='none';
+  ADM={rows:[],items:[]}; admRender(); admPaintBody();
   document.getElementById('admkeyin').value='';
   admAskKey();
-}
-/* 목차 파란 숫자용 — 화별로 '나 아닌 독자'의 코멘트만 센다.
-   관리자 키가 없거나 아직 안 읽어 왔으면 0 이라 칸 자체가 그려지지 않는다. */
-function admOtherCount(ci){
-  if(!ADMKEY||!ADM.items||!ADM.items.length)return 0;
-  const me=READER||'(이름 없음)';
-  let n=0;
-  for(let j=0;j<ADM.items.length;j++){
-    const it=ADM.items[j];
-    if(it.ci===ci&&it.reader!==me)n++;
-  }
-  return n;
 }
 function admLoad(){
   if(!COLLECT){ admMsg('수집 주소가 설정돼 있지 않습니다.'); return; }
@@ -1097,9 +1009,6 @@ function admLoad(){
       return;
     }
     ADM.rows=d.rows||[]; admFlatten(); admRender(); admPaintBody();
-    /* 목차의 파란 숫자를 다시 칠한다. 감싼 paint() 를 쓰면 남의 코멘트를 읽은 것이
-       내 코멘트 전송을 깨우므로, 원본 _paint() 를 부른다. */
-    _paint();
     admMsg('✓ '+hhmm()+' 갱신 · 독자 '+ADM.rows.length+'명 · 코멘트 '+ADM.items.length+'건');
   };
   s.onerror=function(){ if(fin)return; fin=true; cleanup();
@@ -1137,36 +1046,6 @@ function admFlatten(){
   names.forEach(w=>{ const o=document.createElement('option');
     o.value=w; o.textContent=w; sel.appendChild(o); });
   if(names.indexOf(keep)>=0)sel.value=keep;
-  ADMWHO=names.slice();          // 색 배정 기준 (이름순 — 시트 쪽에서 정렬해 온다)
-  admLegend();
-}
-/* 목차 검색창 밑에 「● 김형운  ● 수민」 범례를 깐다. */
-function admLegend(){
-  const side=document.getElementById('side'), nav=document.getElementById('nav');
-  if(!side||!nav)return;
-  let g=document.getElementById('admleg');
-  if(!ADMWHO.length){ if(g)g.remove(); return; }
-  if(!g){ g=document.createElement('div'); g.id='admleg'; side.insertBefore(g,nav); }
-  g.innerHTML='';
-  ADMWHO.forEach(w=>{
-    const n=ADM.items.filter(it=>it.reader===w).length;
-    const e=document.createElement('i');
-    e.style.color=admColor(w);
-    e.textContent=w+' '+n;
-    e.title=w+' — 코멘트 '+n+'건';
-    g.appendChild(e);
-  });
-}
-/* 화별 '나 아닌 독자'의 코멘트를 사람별로 쪼갠 내역. 목차 숫자와 툴팁이 쓴다. */
-function admOtherBreak(ci){
-  if(!ADMKEY||!ADM.items||!ADM.items.length)return [];
-  const me=READER||'(이름 없음)', by={};
-  for(let j=0;j<ADM.items.length;j++){
-    const it=ADM.items[j];
-    if(it.ci!==ci||it.reader===me)continue;
-    by[it.reader]=(by[it.reader]||0)+1;
-  }
-  return ADMWHO.filter(w=>by[w]).map(w=>({who:w,n:by[w],col:admColor(w)}));
 }
 function admFiltered(){
   const who=document.getElementById('admWho').value;
@@ -1202,7 +1081,6 @@ function admRender(){
       L.appendChild(mk('ahd',admTitle(it.ci,it.card)));
     }
     const d=mk('aitem'+(it.kind==='ep'?' ep':''),null);
-    d.style.setProperty('--who', admColor(it.reader));
     const h=mk('ah',null);
     const who=document.createElement('span'); who.className='who'; who.textContent=it.reader;
     const knd=document.createElement('span');
@@ -1244,11 +1122,8 @@ function admJump(it){
 function admPaintBody(){
   const doc=document.getElementById('doc'); if(!doc)return;
   doc.querySelectorAll('.admblk').forEach(e=>{
-    e.classList.remove('admblk'); e.removeAttribute('data-adm');
-    e.style.removeProperty('--who'); });
-  /* ★ 패널이 열려 있는지는 따지지 않는다. 관리자면 처음부터 본문에 보인다.
-     읽는 데 방해되면 상단 「독자 표시 끄기」 로 접는다. */
-  if(!admBodyOn||!ADM.items.length)return;
+    e.classList.remove('admblk'); e.removeAttribute('data-adm'); });
+  if(!admOpen||!ADM.items.length)return;
   const bs=admBlocks(), tally={};
   ADM.items.forEach(it=>{
     if(it.ci!==cur||it.kind==='ep'||it.view!==view)return;
@@ -1259,8 +1134,6 @@ function admPaintBody(){
     const uniq=tally[k].filter((v,i,a)=>a.indexOf(v)===i);
     bs[k].classList.add('admblk');
     bs[k].setAttribute('data-adm',uniq.join(' · '));
-    /* 한 사람이면 그 사람 색, 두 사람 이상이면 중립색으로 둔다. */
-    bs[k].style.setProperty('--who', uniq.length===1?admColor(uniq[0]):'var(--ext)');
   });
 }
 function admCopy(){
