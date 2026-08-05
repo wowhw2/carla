@@ -804,6 +804,8 @@ const LS_N='carla_notes_v1', LS_R='carla_reader_v1', LS_P='carla_pw_v1',
       LS_C='carla_card_v1', LS_S='carla_scroll_v1';
 const COLLECT=(window.COLLECT_URL||'').trim();
 let READER='', sendT=null, lastSent='';
+/* ★[2026-08-06] 되받기용 — 방금 통과한 열람 암호를 들고 있는다(저장하지 않는다). */
+let GATEPW='';
 
 function gmsg(m,ok){const e=document.getElementById('gmsg');e.textContent=m;
   e.style.color=ok?'var(--ins)':'#d8a33a';}
@@ -843,6 +845,7 @@ async function tryOpen(pw,remember,quiet){
     gmsg(e.message||'열지 못했습니다.');
     return false;
   }
+  GATEPW=pw;
   try{
     if(remember)localStorage.setItem(LS_P,pw); else localStorage.removeItem(LS_P);
     localStorage.setItem(LS_R,READER);
@@ -885,6 +888,7 @@ function boot(){
   window.addEventListener('pagehide', rememberScroll);
   document.addEventListener('visibilitychange', ()=>{ if(document.hidden) rememberScroll(); });
   admInit();
+  setTimeout(fetchMine, 400);      // ★열자마자 다른 기기에 있던 내 것을 데려온다
 }
 
 /* ---------- 저장 ---------- */
@@ -1129,6 +1133,9 @@ function syncMine(){
     if((r.reader||'')!==READER) return;
     if(!best || String(r.ts||'') > String(best.ts||'')) best=r;
   });
+  return mergeMine(best);
+}
+function mergeMine(best){
   if(!best || !best.notes || !best.notes.length) return 0;
   const have={};
   notes.forEach(n=>{ have[mineKey(CARDS[n.ci]?CARDS[n.ci].id:'?',n.view,n.kind,n.pidx,n.note)]=1; });
@@ -1144,6 +1151,32 @@ function syncMine(){
   });
   if(add){ persist(); try{ render(); renderPanel(); paint(); }catch(_){} }
   return add;
+}
+/* ★[2026-08-06] 관리자가 아니어도 제 것은 되받는다.
+   이름 + 열람 암호로 서버에 묻고, 서버는 그 이름의 최신 묶음 하나만 돌려준다.
+   남의 것은 이 창구로 나오지 않는다. */
+let mineSeq=0, mineDone=false;
+function fetchMine(){
+  if(mineDone || !COLLECT || !READER || !GATEPW) return;
+  mineDone=true;
+  const cb='__minecb'+(++mineSeq);
+  const s=document.createElement('script');
+  let fin=false;
+  const cleanup=()=>{ try{ delete window[cb]; }catch(_){ window[cb]=undefined; }
+                      if(s.parentNode)s.parentNode.removeChild(s); };
+  window[cb]=function(d){
+    if(fin)return; fin=true; cleanup();
+    if(!d||d.ok!==true||!d.row) return;
+    const add=mergeMine(d.row);
+    if(add) smsg('다른 기기에 있던 내 코멘트 '+add+'건을 가져왔습니다.','ok');
+  };
+  s.onerror=function(){ if(fin)return; fin=true; cleanup(); };
+  setTimeout(()=>{ if(fin)return; fin=true; cleanup(); },20000);
+  s.src=COLLECT+(COLLECT.indexOf('?')>=0?'&':'?')+'mode=mine'
+        +'&who='+encodeURIComponent(READER)
+        +'&pw='+encodeURIComponent(GATEPW)
+        +'&cb='+cb+'&t='+Date.now();
+  document.head.appendChild(s);
 }
 function admFlatten(){
   const out=[];
