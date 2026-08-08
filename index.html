@@ -326,6 +326,7 @@ body.locked{overflow:hidden}
     <button onclick="ifile.click()">불러오기</button>
     <button class="act" id="bSend" onclick="sendNow(1)">지금 보내기</button>
     <button onclick="clearNotes()">전체 삭제</button>
+    <button onclick="resetAll()" title="백업 .md를 받은 뒤 이 기기와 서버의 내 코멘트를 함께 비웁니다">백업 받고 비우기</button>
     <input type="file" id="ifile" accept=".md,.txt,.json" style="display:none"
            onchange="importNotes(this.files[0]);this.value='';">
     <div id="imsg" style="width:100%;font-size:11px;color:var(--gold)"></div>
@@ -627,6 +628,23 @@ function delNote(id){
   render(); renderPanel(); paint();
 }
 function clearNotes(){ notes.length=0; dirty=false; render(); renderPanel(); paint(); }
+/* ★[2026-08-08] 원고가 통째로 바뀌면 문단 위치가 어긋나 옛 코멘트가 엉뚱한 데를 가리킨다.
+   기기만 비우면 서버에서 되받아 되살아나므로, 백업을 내린 뒤 양쪽을 함께 비운다. */
+async function resetAll(){
+  const had=notes.length;
+  if(!had && !confirm('비울 코멘트가 없습니다. 서버에 남은 내 코멘트만 비울까요?')) return;
+  if(had && !confirm(had+'건을 비웁니다. 먼저 백업 .md 파일이 내려받아집니다. 계속할까요?')) return;
+  if(had){ try{ exportNotes(); }catch(_){} }
+  notes.length=0; dirty=false;
+  try{ if(typeof LS_N!=='undefined') localStorage.removeItem(LS_N); }catch(_){}
+  render(); renderPanel(); paint();
+  if(typeof sendNow==='function'){
+    try{ lastSent=''; await sendNow(true); }catch(_){}
+    alertBox('백업을 내려받고 이 기기와 서버의 내 코멘트를 비웠습니다.');
+  }else{
+    alertBox('백업을 내려받고 이 기기의 코멘트를 비웠습니다.');
+  }
+}
 function togglePanel(){
   const wasOpen=PANEL.classList.contains('open');
   PANEL.classList.toggle('open');
